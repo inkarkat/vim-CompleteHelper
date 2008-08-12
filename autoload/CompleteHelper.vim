@@ -56,7 +56,7 @@ function! CompleteHelper#FindMatches( pattern, isBackward )
 	" multi-line matches together with spaces, like the 'J' command. 
 	let l:matchText = substitute( l:matchText, "\n", (&joinspaces ? '  ' : ' '), 'g' )
 	if index(l:matches, l:matchText) == -1
-	    call add(l:matches, l:matchText)
+	    call add(l:matches, {'word': l:matchText})
 	endif
 "****D echomsg '**** match from' string(l:matchPos) 'to' string(l:matchEndPos) l:matchText
 
