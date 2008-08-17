@@ -17,6 +17,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	002	17-Aug-2008	BF: Check for match not yet in the list still
+"				used match text, not object. 
 "	001	13-Aug-2008	file creation
 
 function! CompleteHelper#ExtractText( startPos, endPos )
@@ -68,10 +70,12 @@ function! s:FindMatchesInCurrentWindow( matches, pattern, matchTemplate, options
 	let l:matchText = (has_key(a:options, 'extractor') ? a:options.extractor(l:matchPos, l:matchEndPos) : CompleteHelper#ExtractText(l:matchPos, l:matchEndPos))
 	" Insert mode completion cannot complete multiple lines, so join
 	" multi-line matches together with spaces, like the 'J' command. 
-	let l:matchText = substitute( l:matchText, "\n", (&joinspaces ? '  ' : ' '), 'g' )
-	if index(a:matches, l:matchText) == -1
-	    let l:matchObj = copy(a:matchTemplate)
-	    let l:matchObj.word = l:matchText
+	" TODO let l:matchText = substitute( l:matchText, "\n", (&joinspaces ? '  ' : ' '), 'g' )
+
+	" Only add if this is an actual match that is not yet in the list. 
+	let l:matchObj = copy(a:matchTemplate)
+	let l:matchObj.word = l:matchText
+	if ! empty(l:matchText) && index(a:matches, l:matchObj) == -1
 	    call add( a:matches, l:matchObj )
 	endif
 "****D echomsg '**** match from' string(l:matchPos) 'to' string(l:matchEndPos) l:matchText
@@ -115,6 +119,12 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 "		cp. :help complete-functions). Matches will be appended. 
 "   a:pattern	Regular expression specifying what text will match as a
 "		completion candidate. 
+"		Note: In the buffer where the completion takes place, VIM
+"		temporarily removes the a:base part (as passed to the
+"		complete-function) during the completion. This helps avoiding
+"		that the text directly after the cursor also matches a:pattern
+"		(assuming something like '\<'.a:base.'\k\+') and appears in the
+"		list. 
 "   a:options	Dictionary with match configuration:
 "   a:options.complete	    Specifies what is searched, like the 'complete'
 "			    option. Supported options: '.' for current buffer, 
