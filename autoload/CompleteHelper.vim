@@ -17,6 +17,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	003	18-Aug-2008	Added a:options.multiline; default is to
+"				collapse newline and surrounding whitespace into
+"				a single <Space>. 
 "	002	17-Aug-2008	BF: Check for match not yet in the list still
 "				used match text, not object. 
 "	001	13-Aug-2008	file creation
@@ -68,9 +71,13 @@ function! s:FindMatchesInCurrentWindow( matches, pattern, matchTemplate, options
 	endif
 	let l:matchEndPos = searchpos( a:pattern, 'cen' )
 	let l:matchText = (has_key(a:options, 'extractor') ? a:options.extractor(l:matchPos, l:matchEndPos) : CompleteHelper#ExtractText(l:matchPos, l:matchEndPos))
-	" Insert mode completion cannot complete multiple lines, so join
-	" multi-line matches together with spaces, like the 'J' command. 
-	" TODO let l:matchText = substitute( l:matchText, "\n", (&joinspaces ? '  ' : ' '), 'g' )
+
+	if stridx( l:matchText, "\n") != -1
+	    " Insert mode completion cannot complete multiple lines, so the
+	    " default is to replace newlines plus any surrounding whitespace
+	    " with a single <Space>. 
+	    let l:matchText = (has_key(a:options, 'multiline') ? a:options.multiline(l:matchText) : substitute(l:matchText, "\\s*\n\\s*", ' ', 'g'))
+	endif
 
 	" Only add if this is an actual match that is not yet in the list. 
 	let l:matchObj = copy(a:matchTemplate)
@@ -135,6 +142,10 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 "			    from the current buffer. Will be invoked with
 "			    ([startLine, startCol], [endLine, endCol])
 "			    arguments; must return string. 
+"   a:options.multiline	    Function reference that processes multiline matches,
+"			    as insert mode completion cannot complete multiple
+"			    lines. Will be invoked with (matchText) argument;
+"			    must return processed string. 
 "* RETURN VALUES: 
 "   a:matches
 "*******************************************************************************
