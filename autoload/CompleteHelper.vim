@@ -17,6 +17,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	004	19-Aug-2008	Initial matchObj is now passed to text extractor
+"				function. 
 "	003	18-Aug-2008	Added a:options.multiline; default is to
 "				collapse newline and surrounding whitespace into
 "				a single <Space>. 
@@ -24,7 +26,7 @@
 "				used match text, not object. 
 "	001	13-Aug-2008	file creation
 
-function! CompleteHelper#ExtractText( startPos, endPos )
+function! CompleteHelper#ExtractText( startPos, endPos, matchObj )
 "*******************************************************************************
 "* PURPOSE:
 "   Extract the text between a:startPos and a:endPos from the current buffer. 
@@ -35,8 +37,16 @@ function! CompleteHelper#ExtractText( startPos, endPos )
 "* INPUTS:
 "   a:startPos	    [line,col]
 "   a:endPos	    [line,col]
+"   a:matchObj	    The match object to be returned to the completion function. 
+"		    This function does not need to set anything there, the
+"		    mandatory matchObj.word will be set from this function's
+"		    return value automatically (and with additional processing).
+"		    However, you _can_ modify other items if you deem necessary.
+"		    (E.g. add a note to matchObj.menu that the text was
+"		    truncated.) 
 "* RETURN VALUES: 
-"   string text
+"   string text; return an empty string to signal that no match should be added
+"   to the list of matches. 
 "*******************************************************************************
     let [l:line, l:column] = a:startPos
     let [l:endLine, l:endColumn] = a:endPos
@@ -70,8 +80,12 @@ function! s:FindMatchesInCurrentWindow( matches, pattern, matchTemplate, options
 	    break
 	endif
 	let l:matchEndPos = searchpos( a:pattern, 'cen' )
-	let l:matchText = (has_key(a:options, 'extractor') ? a:options.extractor(l:matchPos, l:matchEndPos) : CompleteHelper#ExtractText(l:matchPos, l:matchEndPos))
 
+	" Initialize the match object and extract the match text. 
+	let l:matchObj = copy(a:matchTemplate)
+	let l:matchText = (has_key(a:options, 'extractor') ? a:options.extractor(l:matchPos, l:matchEndPos, l:matchObj) : CompleteHelper#ExtractText(l:matchPos, l:matchEndPos, l:matchObj))
+
+	" Process multi-line matches. 
 	if stridx( l:matchText, "\n") != -1
 	    " Insert mode completion cannot complete multiple lines, so the
 	    " default is to replace newlines plus any surrounding whitespace
@@ -79,9 +93,11 @@ function! s:FindMatchesInCurrentWindow( matches, pattern, matchTemplate, options
 	    let l:matchText = (has_key(a:options, 'multiline') ? a:options.multiline(l:matchText) : substitute(l:matchText, "\\s*\n\\s*", ' ', 'g'))
 	endif
 
-	" Only add if this is an actual match that is not yet in the list. 
-	let l:matchObj = copy(a:matchTemplate)
+	" Store match text in match object. 
 	let l:matchObj.word = l:matchText
+
+	" Only add if this is an actual match that is not yet in the list of
+	" matches. 
 	if ! empty(l:matchText) && index(a:matches, l:matchObj) == -1
 	    call add( a:matches, l:matchObj )
 	endif
@@ -140,8 +156,9 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 "				position. 
 "   a:options.extractor	    Function reference that extracts the matched text
 "			    from the current buffer. Will be invoked with
-"			    ([startLine, startCol], [endLine, endCol])
-"			    arguments; must return string. 
+"			    ([startLine, startCol], [endLine, endCol], matchObj)
+"			    arguments; must return string; can modify the
+"			    initial matchObj. 
 "   a:options.multiline	    Function reference that processes multiline matches,
 "			    as insert mode completion cannot complete multiple
 "			    lines. Will be invoked with (matchText) argument;
