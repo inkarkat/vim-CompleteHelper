@@ -17,6 +17,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	005	03-Mar-2009	Now restoring window sizes in
+"				s:FindMatchesInOtherWindows() to avoid
+"				increating window height from 0 to 1. 
 "	004	19-Aug-2008	Initial matchObj is now passed to text extractor
 "				function. 
 "	003	18-Aug-2008	Added a:options.multiline; default is to
@@ -115,6 +118,11 @@ function! s:FindMatchesInOtherWindows( matches, pattern, options )
     let l:searchedBuffers = { bufnr('') : 1 }
     let l:originalWinNr = winnr()
 
+    " By entering a window, its height is potentially increased from 0 to 1 (the
+    " minimum for the current window). To avoid any modification, save the window
+    " sizes and restore them after visiting all windows. 
+    let l:originalWindowLayout = winrestcmd()
+
     for l:winNr in range(1, winnr('$'))
 	execute l:winNr 'wincmd w'
 
@@ -127,6 +135,7 @@ function! s:FindMatchesInOtherWindows( matches, pattern, options )
     endfor
 
     execute l:originalWinNr 'wincmd w'
+    silent! execute l:originalWindowLayout
 endfunction
 function! CompleteHelper#FindMatches( matches, pattern, options )
 "*******************************************************************************
