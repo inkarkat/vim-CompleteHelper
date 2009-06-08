@@ -166,8 +166,9 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 "   a:options.extractor	    Function reference that extracts the matched text
 "			    from the current buffer. Will be invoked with
 "			    ([startLine, startCol], [endLine, endCol], matchObj)
-"			    arguments; must return string; can modify the
-"			    initial matchObj. 
+"			    arguments with the cursor positioned at the start of
+"			    the current match; must return string; can modify
+"			    the initial matchObj. 
 "   a:options.multiline	    Function reference that processes multiline matches,
 "			    as insert mode completion cannot complete multiple
 "			    lines. Will be invoked with (matchText) argument;
