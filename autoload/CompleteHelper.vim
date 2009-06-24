@@ -11,12 +11,18 @@
 " KNOWN PROBLEMS:
 " TODO:
 "
-" Copyright: (C) 2008 by Ingo Karkat
+" Copyright: (C) 2008-2009 by Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'. 
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	006	09-Jun-2009	Do not include a match ending at the cursor
+"				position when finding completions in the buffer
+"				where the completion is undertaken. 
+"				Vim would not offer this anyway, and this way it
+"				feels cleaner and does not confuse unit tests.
+"				Such a match can happen if a:base =~ a:pattern. 
 "	005	03-Mar-2009	Now restoring window sizes in
 "				s:FindMatchesInOtherWindows() to avoid
 "				increating window height from 0 to 1. 
@@ -70,7 +76,7 @@ function! CompleteHelper#ExtractText( startPos, endPos, matchObj )
     endwhile
     return l:text
 endfunction
-function! s:FindMatchesInCurrentWindow( matches, pattern, matchTemplate, options )
+function! s:FindMatchesInCurrentWindow( matches, pattern, matchTemplate, options, isInCompletionBuffer )
     let l:isBackward = has_key(a:options, 'backward_search')
 
     let l:save_cursor = getpos('.')
@@ -82,7 +88,18 @@ function! s:FindMatchesInCurrentWindow( matches, pattern, matchTemplate, options
 	    " Stop when no matches or wrapped around to first match. 
 	    break
 	endif
+	if l:firstMatchPos == [0,0]
+	    " Record first match position to detect wrap-around. 
+	    let l:firstMatchPos = l:matchPos
+	endif
+
 	let l:matchEndPos = searchpos( a:pattern, 'cen' )
+	if a:isInCompletionBuffer && (l:matchEndPos == l:save_cursor[1:2])
+	    " Do not include a match ending at the cursor position; this is just
+	    " the completion base, and Vim would not offer this anyway. Such a
+	    " match can happen if a:base =~ a:pattern. 
+	    continue
+	endif
 
 	" Initialize the match object and extract the match text. 
 	let l:matchObj = copy(a:matchTemplate)
@@ -105,11 +122,6 @@ function! s:FindMatchesInCurrentWindow( matches, pattern, matchTemplate, options
 	    call add( a:matches, l:matchObj )
 	endif
 "****D echomsg '**** match from' string(l:matchPos) 'to' string(l:matchEndPos) l:matchText
-
-	if l:firstMatchPos == [0,0]
-	    " Record first match position to detect wrap-around. 
-	    let l:firstMatchPos = l:matchPos
-	endif
     endwhile
     
     call setpos('.', l:save_cursor)
@@ -129,7 +141,7 @@ function! s:FindMatchesInOtherWindows( matches, pattern, options )
 	let l:matchTemplate = { 'menu': bufname('') }
 
 	if ! has_key( l:searchedBuffers, bufnr('') )
-	    call s:FindMatchesInCurrentWindow( a:matches, a:pattern, l:matchTemplate, a:options )
+	    call s:FindMatchesInCurrentWindow( a:matches, a:pattern, l:matchTemplate, a:options, 0 )
 	    let l:searchedBuffers[ bufnr('') ] = 1
 	endif
     endfor
@@ -179,7 +191,7 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
     let l:complete = get(a:options, 'complete', '')
     for l:places in split(l:complete, ',')
 	if l:places == '.'
-	    call s:FindMatchesInCurrentWindow( a:matches, a:pattern, {}, a:options )
+	    call s:FindMatchesInCurrentWindow( a:matches, a:pattern, {}, a:options, 1 )
 	elseif l:places == 'w'
 	    call s:FindMatchesInOtherWindows( a:matches, a:pattern, a:options )
 	endif
