@@ -17,6 +17,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	007	25-Jun-2009	Now using :noautocmd to avoid unnecessary
+"				processing while searching other windows. 
 "	006	09-Jun-2009	Do not include a match ending at the cursor
 "				position when finding completions in the buffer
 "				where the completion is undertaken. 
@@ -136,7 +138,7 @@ function! s:FindMatchesInOtherWindows( matches, pattern, options )
     let l:originalWindowLayout = winrestcmd()
 
     for l:winNr in range(1, winnr('$'))
-	execute l:winNr 'wincmd w'
+	execute 'noautocmd' l:winNr . 'wincmd w'
 
 	let l:matchTemplate = { 'menu': bufname('') }
 
@@ -146,7 +148,7 @@ function! s:FindMatchesInOtherWindows( matches, pattern, options )
 	endif
     endfor
 
-    execute l:originalWinNr 'wincmd w'
+    execute 'noautocmd' l:originalWinNr . 'wincmd w'
     silent! execute l:originalWindowLayout
 endfunction
 function! CompleteHelper#FindMatches( matches, pattern, options )
