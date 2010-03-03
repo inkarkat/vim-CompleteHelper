@@ -165,12 +165,15 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 "		cp. :help complete-functions). Matches will be appended. 
 "   a:pattern	Regular expression specifying what text will match as a
 "		completion candidate. 
-"		Note: In the buffer where the completion takes place, VIM
+"		Note: In the buffer where the completion takes place, Vim
 "		temporarily removes the a:base part (as passed to the
 "		complete-function) during the completion. This helps avoiding
 "		that the text directly after the cursor also matches a:pattern
 "		(assuming something like '\<'.a:base.'\k\+') and appears in the
 "		list. 
+"		Note: Matching is done via the searchpos() function, so the
+"		'ignorecase' and 'smartcase' settings apply. Add |/\c| / |/\C|
+"		to the regexp to set the case sensitivity. 
 "   a:options	Dictionary with match configuration:
 "   a:options.complete	    Specifies what is searched, like the 'complete'
 "			    option. Supported options: '.' for current buffer, 
