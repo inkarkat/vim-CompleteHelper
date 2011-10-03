@@ -4,6 +4,8 @@
 " USAGE:
 " INSTALLATION:
 " DEPENDENCIES:
+"   - EchoWithoutScrolling.vim autoload script for CompleteHelper#Abbreviate(). 
+"
 " CONFIGURATION:
 " INTEGRATION:
 " LIMITATIONS:
@@ -11,12 +13,14 @@
 " KNOWN PROBLEMS:
 " TODO:
 "
-" Copyright: (C) 2008-2010 by Ingo Karkat
+" Copyright: (C) 2008-2011 by Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'. 
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	009	04-Oct-2011	Move CompleteHelper#Abbreviate() from
+"				MotionComplete.vim to allow reuse. 
 "	008	04-Mar-2010	Collapse multiple lines consisting of only
 "				whitespace and a newline into a single space,
 "				not one space per line. 
@@ -204,6 +208,30 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 	    call s:FindMatchesInOtherWindows( a:matches, a:pattern, a:options )
 	endif
     endfor
+endfunction
+
+let s:tabReplacement = matchstr(&listchars, 'tab:\zs..')
+let s:tabReplacement = (empty(s:tabReplacement) ? '^I' : s:tabReplacement)
+function! CompleteHelper#Abbreviate( matchObj )
+"******************************************************************************
+"* PURPOSE:
+"   Shorten the match abbreviation; also change (invisible) <Tab> characters. 
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None. 
+"* EFFECTS / POSTCONDITIONS:
+"   None. 
+"* INPUTS:
+"   a:matchObj	    The match object to be returned to the completion function. 
+"* RETURN VALUES: 
+"   Extended match object with 'abbr' attribute. 
+"******************************************************************************
+    let l:abbreviatedMatch = substitute(a:matchObj.word, '\t', s:tabReplacement, 'g')
+    let l:maxDisplayLen = &columns / 2
+    if len(l:abbreviatedMatch) > l:maxDisplayLen
+	let a:matchObj.abbr = EchoWithoutScrolling#TruncateTo( l:abbreviatedMatch, l:maxDisplayLen )
+    endif
+
+    return a:matchObj
 endfunction
 
 " vim: set sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
