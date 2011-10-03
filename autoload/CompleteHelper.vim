@@ -21,6 +21,7 @@
 " REVISION	DATE		REMARKS 
 "	009	04-Oct-2011	Move CompleteHelper#Abbreviate() from
 "				MotionComplete.vim to allow reuse. 
+"				Also translate newline characters. 
 "	008	04-Mar-2010	Collapse multiple lines consisting of only
 "				whitespace and a newline into a single space,
 "				not one space per line. 
@@ -210,12 +211,19 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
     endfor
 endfunction
 
-let s:tabReplacement = matchstr(&listchars, 'tab:\zs..')
-let s:tabReplacement = (empty(s:tabReplacement) ? '^I' : s:tabReplacement)
+function! s:ListChar( settingFilter, fallback )
+    let listchar = matchstr(&listchars, a:settingFilter)
+    return (empty(listchar) ? a:fallback : listchar)
+endfunction
+let s:tabReplacement = s:ListChar('tab:\zs..', '^I')
+let s:eolReplacement = s:ListChar('eol:\zs.', '^J') " Vim commands like :reg show newlines as ^J.
+delfunction s:ListChar
+
 function! CompleteHelper#Abbreviate( matchObj )
 "******************************************************************************
 "* PURPOSE:
-"   Shorten the match abbreviation; also change (invisible) <Tab> characters. 
+"   Shorten the match abbreviation and change (invisible) <Tab> and newline
+"   characters to what's defined in 'listchars'. 
 "* ASSUMPTIONS / PRECONDITIONS:
 "   None. 
 "* EFFECTS / POSTCONDITIONS:
@@ -226,9 +234,13 @@ function! CompleteHelper#Abbreviate( matchObj )
 "   Extended match object with 'abbr' attribute. 
 "******************************************************************************
     let l:abbreviatedMatch = substitute(a:matchObj.word, '\t', s:tabReplacement, 'g')
+    let l:abbreviatedMatch = substitute(l:abbreviatedMatch, "\n", s:eolReplacement, 'g')
+
     let l:maxDisplayLen = &columns / 2
     if len(l:abbreviatedMatch) > l:maxDisplayLen
 	let a:matchObj.abbr = EchoWithoutScrolling#TruncateTo( l:abbreviatedMatch, l:maxDisplayLen )
+    elseif l:abbreviatedMatch !=# a:matchObj.word
+	let a:matchObj.abbr = l:abbreviatedMatch
     endif
 
     return a:matchObj
