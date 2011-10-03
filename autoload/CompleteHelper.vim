@@ -11,12 +11,15 @@
 " KNOWN PROBLEMS:
 " TODO:
 "
-" Copyright: (C) 2008-2009 by Ingo Karkat
+" Copyright: (C) 2008-2010 by Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'. 
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	008	04-Mar-2010	Collapse multiple lines consisting of only
+"				whitespace and a newline into a single space,
+"				not one space per line. 
 "	007	25-Jun-2009	Now using :noautocmd to avoid unnecessary
 "				processing while searching other windows. 
 "	006	09-Jun-2009	Do not include a match ending at the cursor
@@ -110,9 +113,9 @@ function! s:FindMatchesInCurrentWindow( matches, pattern, matchTemplate, options
 	" Process multi-line matches. 
 	if stridx( l:matchText, "\n") != -1
 	    " Insert mode completion cannot complete multiple lines, so the
-	    " default is to replace newlines plus any surrounding whitespace
+	    " default is to replace newline(s) plus any surrounding whitespace
 	    " with a single <Space>. 
-	    let l:matchText = (has_key(a:options, 'multiline') ? a:options.multiline(l:matchText) : substitute(l:matchText, "\\s*\n\\s*", ' ', 'g'))
+	    let l:matchText = (has_key(a:options, 'multiline') ? a:options.multiline(l:matchText) : substitute(l:matchText, "\\%(\\s*\n\\)\\+\\s*", ' ', 'g'))
 	endif
 
 	" Store match text in match object. 
