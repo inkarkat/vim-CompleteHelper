@@ -19,6 +19,13 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"	010	04-Oct-2011	Turn multi-line join into
+"				CompleteHelper#JoinMultiline() utility function
+"				and remove the default processing, now that I
+"				have found a workaround to make Vim handle
+"				matches with newlines. Rename "multiline" option
+"				to a convenience "processor" option, to be used
+"				by LongestComplete.vim. 
 "	009	04-Oct-2011	Move CompleteHelper#Abbreviate() from
 "				MotionComplete.vim to allow reuse. 
 "				Also translate newline characters. 
@@ -115,12 +122,9 @@ function! s:FindMatchesInCurrentWindow( matches, pattern, matchTemplate, options
 	let l:matchObj = copy(a:matchTemplate)
 	let l:matchText = (has_key(a:options, 'extractor') ? a:options.extractor(l:matchPos, l:matchEndPos, l:matchObj) : CompleteHelper#ExtractText(l:matchPos, l:matchEndPos, l:matchObj))
 
-	" Process multi-line matches. 
-	if stridx( l:matchText, "\n") != -1
-	    " Insert mode completion cannot complete multiple lines, so the
-	    " default is to replace newline(s) plus any surrounding whitespace
-	    " with a single <Space>. 
-	    let l:matchText = (has_key(a:options, 'multiline') ? a:options.multiline(l:matchText) : substitute(l:matchText, "\\%(\\s*\n\\)\\+\\s*", ' ', 'g'))
+	" Custom processing of match text. 
+	if has_key(a:options, 'processor')
+	    let l:matchText = a:options.processor(l:matchText)
 	endif
 
 	" Store match text in match object. 
@@ -194,10 +198,13 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 "			    arguments with the cursor positioned at the start of
 "			    the current match; must return string; can modify
 "			    the initial matchObj. 
-"   a:options.multiline	    Function reference that processes multiline matches,
-"			    as insert mode completion cannot complete multiple
-"			    lines. Will be invoked with (matchText) argument;
-"			    must return processed string. 
+"   a:options.processor	    Function reference that processes matches. Will be
+"			    invoked with an a:matchText argument; must return
+"			    processed string, or empty string if the match
+"			    should be discarded. Alternatively, you can filter()
+"			    / map() the a:matches result returned from this
+"			    function, but passing in a function may be easier
+"			    for you. 
 "* RETURN VALUES: 
 "   a:matches
 "*******************************************************************************
@@ -244,6 +251,25 @@ function! CompleteHelper#Abbreviate( matchObj )
     endif
 
     return a:matchObj
+endfunction
+
+function! CompleteHelper#JoinMultiline( text )
+"******************************************************************************
+"* PURPOSE:
+"   Replace newline(s) plus any surrounding whitespace with a single <Space>. 
+"   Insert mode completion currently does not deal sensibly with multi-line
+"   completions (newlines are inserted literally as ^@), so completions may want
+"   to do processing to offer a better behavior.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   None. 
+"* EFFECTS / POSTCONDITIONS:
+"   None. 
+"* INPUTS:
+"   a:text
+"* RETURN VALUES: 
+"   Contents of a:text joined into a single line without newline characters. 
+"******************************************************************************
+    return (stridx(a:text, "\n") == -1 ? a:text : substitute(a:text, "\\%(\\s*\n\\)\\+\\s*", ' ', 'g'))
 endfunction
 
 " vim: set sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
