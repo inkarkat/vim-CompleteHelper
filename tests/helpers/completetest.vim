@@ -1,3 +1,5 @@
+" Use this only if you cannot :set completefunc=FooComplete#FooComplete directly
+" (e.g. if it is a script-local function). 
 function! SetCompletion( completeMapping )
     execute 'normal Go' . a:completeMapping . "\<Esc>"
     normal! Gdd
@@ -5,15 +7,13 @@ function! SetCompletion( completeMapping )
 endfunction
 function! IsMatchesAtCursor( isAppend, base, expectedMatches, description )
     " Test completion at the current cursor position. 
-    execute 'normal' (a:isAppend ? 'a' : 'i') . a:base . (exists('g:completeMapping') ? g:completeMapping : "\<C-x>\<C-u>") . "\<Esc>"
-    let l:completions = call(&completefunc, [0, a:base])
+    execute 'normal' (a:isAppend ? 'a' : 'i') . a:base
+    let l:startCol = call(&completefunc, [1, ''])
+    let l:base = strpart(getline('.'), l:startCol, (col('.') - l:startCol) + a:isAppend)
+    let l:completions = call(&completefunc, [0, l:base])
     let l:actualMatches = map(l:completions, 'v:val.word')
 
-    " Always do a case-insensitive comparison. 
-    let l:save_ignorecase = &ignorecase
-    set noignorecase
     call vimtap#collections#IsSet(l:actualMatches, a:expectedMatches, a:description)
-    let &ignorecase = l:save_ignorecase
 endfunction
 
 function! IsMatchesInIsolatedLine( base, expectedMatches, description )
