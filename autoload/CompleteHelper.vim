@@ -186,6 +186,9 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 "		Note: Matching is done via the searchpos() function, so the
 "		'ignorecase' and 'smartcase' settings apply. Add |/\c| / |/\C|
 "		to the regexp to set the case sensitivity. 
+"		Note: An empty pattern does not match at all, so take care of
+"		passing a sensible default! '\V' will match every single
+"		character individually; probably not what you want. 
 "   a:options	Dictionary with match configuration:
 "   a:options.complete	    Specifies what is searched, like the 'complete'
 "			    option. Supported options: '.' for current buffer, 
