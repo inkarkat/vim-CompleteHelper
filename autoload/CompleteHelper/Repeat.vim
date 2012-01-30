@@ -17,7 +17,6 @@ let s:lastPos = []
 let s:repeatCnt = 0
 function! CompleteHelper#Repeat#SetRecord()
     let s:record = s:Record()
-echomsg '#### SetRecord'
 endfunction
 function! s:Record()
     return [tabpagenr(), winnr(), bufnr(''), b:changedtick, &completefunc] + getpos('.')
@@ -29,8 +28,6 @@ function! CompleteHelper#Repeat#TestForRepeat()
     augroup END
 
     let l:pos = getpos('.')[1:2]
-echomsg '####' string(s:record)
-echomsg '    ' string(s:Record())
     if s:record == s:Record()
 	let s:repeatCnt += 1
 	let l:bpos = [l:pos[0], l:pos[1] - 1]
