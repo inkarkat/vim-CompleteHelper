@@ -3,13 +3,13 @@
 "
 " DEPENDENCIES:
 "
-" Copyright: (C) 2011 Ingo Karkat
+" Copyright: (C) 2011-2012 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'. 
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
-"	001	09-Oct-2011	file creation
+"   1.00.001	09-Oct-2011	file creation
 
 let s:record = []
 let s:startPos = []
