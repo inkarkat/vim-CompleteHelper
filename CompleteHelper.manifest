@@ -1,0 +1,4 @@
+autoload/CompleteHelper.vim
+autoload/CompleteHelper/Repeat.vim
+autoload/EchoWithoutScrolling.vim
+doc/CompleteHelper.txt
