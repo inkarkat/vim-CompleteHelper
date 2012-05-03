@@ -1,24 +1,15 @@
 " CompleteHelper.vim: Generic functions to support custom insert mode completions. 
 "
-" DESCRIPTION:
-" USAGE:
-" INSTALLATION:
 " DEPENDENCIES:
 "   - EchoWithoutScrolling.vim autoload script for CompleteHelper#Abbreviate(). 
 "
-" CONFIGURATION:
-" INTEGRATION:
-" LIMITATIONS:
-" ASSUMPTIONS:
-" KNOWN PROBLEMS:
-" TODO:
-"
-" Copyright: (C) 2008-2011 by Ingo Karkat
+" Copyright: (C) 2008-2012 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'. 
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS 
+"   1.00.011	31-Jan-2012	Prepare for publish. 
 "	010	04-Oct-2011	Turn multi-line join into
 "				CompleteHelper#JoinMultiline() utility function
 "				and remove the default processing, now that I
@@ -56,6 +47,7 @@ function! CompleteHelper#ExtractText( startPos, endPos, matchObj )
 "*******************************************************************************
 "* PURPOSE:
 "   Extract the text between a:startPos and a:endPos from the current buffer. 
+"   Multiple lines will be delimited by a newline character. 
 "* ASSUMPTIONS / PRECONDITIONS:
 "   none
 "* EFFECTS / POSTCONDITIONS:
