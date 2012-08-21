@@ -53,9 +53,10 @@ Low-level function for extracting text from the current buffer. This is the
 default extractor used by CompleteHelper#FindMatches().
 
 
-CompleteHelper#Abbreviate( matchObj )
+CompleteHelper#Abbreviate#Word( matchObj )
 
-Processes the match objects to make them prettier to display.
+Processes the match objects to make them prettier to display. Usually
+|map()|ed over the matches returned from CompleteHelper#FindMatches().
 
 
 CompleteHelper#JoinMultiline( text )
@@ -131,9 +132,12 @@ IDEAS							*CompleteHelper-ideas*
 ==============================================================================
 HISTORY						      *CompleteHelper-history*
 
-1.01	04-May-2012
-Factor out CompleteHelper#Abbreviate#Text() to allow processing of completion
-menu text (and other uses), too.
+1.10	05-May-2012
+- Factor out CompleteHelper#Abbreviate#Text() to allow processing of
+  completion menu text (and other uses), too.
+- ENH: Offer full completion word in the preview window when it is shown
+  abbreviated. Clients get this automatically when using
+  CompleteHelper#Abbreviate#Word().
 
 1.00	31-Jan-2012
 First published version.
