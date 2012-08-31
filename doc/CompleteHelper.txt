@@ -22,16 +22,39 @@ functions around extraction and handling of completion matches (something that
 Vim doesn't yet expose to Vimscript), so that building your own custom
 completion is quick and simple.
 
-HOW IT WORKS								     *
-
 SEE ALSO								     *
 
 The following custom completions use this plugin:
 
+BidiComplete:		Considers text before AND AFTER the cursor.
+
 CamelCaseComplete:	Expands CamelCaseWords and underscore_words based on
 (vimscript #3915)	anchor characters for each word fragment.
 
-RELATED WORKS								     *
+CustomKeywordComplete:	Expands keywords from a sequence of contained
+			characters.
+
+LongestComplete:	Completes based on the longest possible text before
+			the cursor.
+
+MinLengthComplete:	Only offers completions that add more than n
+			characters.
+
+MotionComplete:		Completes a text chunk determined by {motion} or text
+			object.
+
+MultiWordComplete:	Completes a sequence of words based on anchor
+			characters for each word.
+
+PatternComplete:	Completes matches of queried {pattern} or last search
+			pattern.
+
+PrevInsertComplete:	Recall and insert mode completion for previously
+(vimscript #4185)	inserted text.
+
+RegisterComplete:	Completes register contents.
+
+WORDComplete:	    	Completes an entire sequence of non-blank characters.
 
 ==============================================================================
 USAGE							*CompleteHelper-usage*
