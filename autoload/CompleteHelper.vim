@@ -10,6 +10,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.11.013	01-Sep-2012	Make a:matchObj in CompleteHelper#ExtractText()
+"				optional; it's not used there, anyway. This
+"				avoids having to pass an empty dictionary just
+"				to satisfy the API.
 "   1.10.012	04-May-2012	Factor out CompleteHelper#Abbreviate#Text() to
 "				allow processing of completion menu text, too.
 "   1.00.011	31-Jan-2012	Prepare for publish.
@@ -46,7 +50,7 @@
 "				used match text, not object.
 "	001	13-Aug-2008	file creation
 
-function! CompleteHelper#ExtractText( startPos, endPos, matchObj )
+function! CompleteHelper#ExtractText( startPos, endPos, ... )
 "*******************************************************************************
 "* PURPOSE:
 "   Extract the text between a:startPos and a:endPos from the current buffer.
@@ -115,7 +119,7 @@ function! s:FindMatchesInCurrentWindow( matches, pattern, matchTemplate, options
 
 	" Initialize the match object and extract the match text.
 	let l:matchObj = copy(a:matchTemplate)
-	let l:matchText = (has_key(a:options, 'extractor') ? a:options.extractor(l:matchPos, l:matchEndPos, l:matchObj) : CompleteHelper#ExtractText(l:matchPos, l:matchEndPos, l:matchObj))
+	let l:matchText = (has_key(a:options, 'extractor') ? a:options.extractor(l:matchPos, l:matchEndPos, l:matchObj) : CompleteHelper#ExtractText(l:matchPos, l:matchEndPos))
 
 	" Custom processing of match text.
 	if has_key(a:options, 'processor')
