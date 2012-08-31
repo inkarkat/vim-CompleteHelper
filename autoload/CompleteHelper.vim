@@ -10,7 +10,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.01.012	04-May-2012	Factor out CompleteHelper#Abbreviate#Text() to
+"   1.10.012	04-May-2012	Factor out CompleteHelper#Abbreviate#Text() to
 "				allow processing of completion menu text, too.
 "   1.00.011	31-Jan-2012	Prepare for publish.
 "	010	04-Oct-2011	Turn multi-line join into
@@ -216,6 +216,7 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
     endfor
 endfunction
 
+" Deprecated. Use CompleteHelper#Abbreviate#Word() instead.
 function! CompleteHelper#Abbreviate( matchObj )
     return CompleteHelper#Abbreviate#Word(a:matchObj)
 endfunction
