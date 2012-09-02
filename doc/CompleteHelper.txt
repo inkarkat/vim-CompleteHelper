@@ -155,7 +155,7 @@ IDEAS							*CompleteHelper-ideas*
 ==============================================================================
 HISTORY						      *CompleteHelper-history*
 
-1.11	01-Sep-2012
+1.11	03-Sep-2012
 - Make a:matchObj in CompleteHelper#ExtractText() optional; it's not used
   there, anyway. This avoids having to pass an empty dictionary just to
   satisfy the API.
