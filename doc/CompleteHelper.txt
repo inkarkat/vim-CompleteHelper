@@ -155,6 +155,13 @@ IDEAS							*CompleteHelper-ideas*
 ==============================================================================
 HISTORY						      *CompleteHelper-history*
 
+1.11	01-Sep-2012
+- Make a:matchObj in CompleteHelper#ExtractText() optional; it's not used
+  there, anyway. This avoids having to pass an empty dictionary just to
+  satisfy the API.
+- Introduce a:alreadySearchedBuffers to allow for swapped order in
+  a:options.complete and to prepare for additional complete options.
+
 1.10	05-May-2012
 - Factor out CompleteHelper#Abbreviate#Text() to allow processing of
   completion menu text (and other uses), too.
