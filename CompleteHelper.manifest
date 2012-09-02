@@ -1,4 +1,5 @@
 autoload/CompleteHelper.vim
+autoload/CompleteHelper/Abbreviate.vim
 autoload/CompleteHelper/Repeat.vim
 autoload/EchoWithoutScrolling.vim
 doc/CompleteHelper.txt
