@@ -126,10 +126,10 @@ the appropriate match objects to CompleteHelper#FindMatches().
 INSTALLATION					 *CompleteHelper-installation*
 
 This script is packaged as a |vimball|. If you have the "gunzip" decompressor
-in your PATH, simply edit the *.vba.gz package in Vim; otherwise, decompress
+in your PATH, simply edit the *.vmb.gz package in Vim; otherwise, decompress
 the archive first, e.g. using WinZip. Inside Vim, install by sourcing the
 vimball or via the |:UseVimball| command. >
-    vim CompleteHelper.vba.gz
+    vim CompleteHelper*.vmb.gz
     :so %
 To uninstall, use the |:RmVimball| command.
 
@@ -140,11 +140,14 @@ DEPENDENCIES					 *CompleteHelper-dependencies*
 ==============================================================================
 LIMITATIONS					  *CompleteHelper-limitations*
 
-- Only the '.' (current buffer) and 'w' (other windows) values of 'complete'
-  are currently implemented. As the searched buffers need to be displayed in a
-  window and jumped around for text extraction, this doesn't scale well. I
-  would wish for a built-in Vim function that does this (and supports all
-  values of 'complete').
+- Only the '.' (current buffer), 'w' (other windows), and 'b' (other listed
+  buffers) values (the last one with limitations) of 'complete'
+  are currently implemented.
+- As the searched buffers need to be either displayed in a
+  window and jumped around for text extraction, or the buffer contents
+  searched line by line, this doesn't scale well in Vimscript. I would wish
+  for a built-in Vim function that does this (and supports all values of
+  'complete').
 
 KNOWN PROBLEMS				       *CompleteHelper-known-problems*
 
@@ -154,6 +157,12 @@ IDEAS							*CompleteHelper-ideas*
 
 ==============================================================================
 HISTORY						      *CompleteHelper-history*
+
+1.20	03-Sep-2012
+- ENH: Implement a:options.complete = 'b' (only supporting single-line matches and no a:options.extractor).
+- Transparently handle 'autochdir': still show the correct relative path in
+  matches from other windows, and restore the buffer's CWD even if it was
+  temporarily changed.
 
 1.11	03-Sep-2012
 - Make a:matchObj in CompleteHelper#ExtractText() optional; it's not used
