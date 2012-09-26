@@ -11,6 +11,11 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.30.015	27-Sep-2012	Optimization: Skip search in other windows where
+"				there's only one that got searched already by
+"				s:FindMatchesInCurrentWindow().
+"				Optimization: Only visit window when it's buffer
+"				wasn't already searched.
 "   1.20.014	03-Sep-2012	ENH: Implement a:options.complete = 'b' (only
 "				supporting single-line matches and no
 "				a:options.extractor).
@@ -163,6 +168,9 @@ function! s:FindMatchesInCurrentWindow( alreadySearchedBuffers, matches, pattern
 endfunction
 function! s:FindMatchesInOtherWindows( alreadySearchedBuffers, matches, pattern, options )
     let l:originalWinNr = winnr()
+    if winnr('$') == 1 && has_key(a:alreadySearchedBuffers, winbufnr(l:originalWinNr)
+	return  " There's only one window, and we have searched it already (probably via s:FindMatchesInCurrentWindow()).
+    endif
 
     " By entering a window, its height is potentially increased from 0 to 1 (the
     " minimum for the current window). To avoid any modification, save the window
@@ -182,11 +190,10 @@ function! s:FindMatchesInOtherWindows( alreadySearchedBuffers, matches, pattern,
 
     try
 	for l:winNr in range(1, winnr('$'))
-	    execute 'noautocmd' l:winNr . 'wincmd w'
+	    if ! has_key(a:alreadySearchedBuffers, winbufnr(l:winNr))
+		execute 'noautocmd' l:winNr . 'wincmd w'
 
-	    let l:matchTemplate = {'menu': bufname('')}
-
-	    if ! has_key(a:alreadySearchedBuffers, bufnr(''))
+		let l:matchTemplate = {'menu': bufname('')}
 		call s:FindMatchesInCurrentWindow(a:alreadySearchedBuffers, a:matches, a:pattern, l:matchTemplate, a:options, 0)
 	    endif
 	endfor
