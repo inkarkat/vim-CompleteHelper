@@ -49,7 +49,7 @@ MultiWordComplete:	Completes a sequence of words based on anchor
 			characters for each word.
 
 PatternComplete:	Completes matches of queried {pattern} or last search
-			pattern.
+(vimscript #4248)	pattern.
 
 PrevInsertComplete:	Recall and insert mode completion for previously
 (vimscript #4185)	inserted text.
