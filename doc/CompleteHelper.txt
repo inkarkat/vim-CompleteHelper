@@ -43,7 +43,11 @@ MinLengthComplete:	Only offers completions that add more than n
 			characters.
 
 MotionComplete:		Completes a text chunk determined by {motion} or text
-			object.
+(vimscript #0000)	object.
+			Derivatives:
+    BracketComplete	Completes text inside various brackets.
+
+    LineEndComplete	Completes the rest of the line.
 
 MultiWordComplete:	Completes a sequence of words based on anchor
 			characters for each word.
