@@ -42,12 +42,14 @@ LongestComplete:	Completes based on the longest possible text before
 MinLengthComplete:	Only offers completions that add more than n
 			characters.
 
-MotionComplete:		Completes a text chunk determined by {motion} or text
-(vimscript #0000)	object.
+MotionComplete:		Completes a chunk covered by queried {motion} or text
+(vimscript #4265)	object.
 			Derivatives:
     BracketComplete	Completes text inside various brackets.
+    (vimscript #4266)
 
     LineEndComplete	Completes the rest of the line.
+    (vimscript #4267)
 
 MultiWordComplete:	Completes a sequence of words based on anchor
 			characters for each word.
