@@ -65,6 +65,9 @@ RegisterComplete:	Completes register contents.
 SameFiletypeComplete:	Completion from buffers with the same filetype.
 (vimscript #4242)
 
+SnippetComplete:	Completes defined abbreviations and other snippets.
+(vimscript #2926)
+
 WORDComplete:	    	Completes an entire sequence of non-blank characters.
 
 ==============================================================================
