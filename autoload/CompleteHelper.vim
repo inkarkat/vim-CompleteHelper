@@ -14,8 +14,10 @@
 "   1.30.015	27-Sep-2012	Optimization: Skip search in other windows where
 "				there's only one that got searched already by
 "				s:FindMatchesInCurrentWindow().
-"				Optimization: Only visit window when it's buffer
+"				Optimization: Only visit window when its buffer
 "				wasn't already searched.
+"				ENH: Allow skipping of buffers via new
+"				a:options.bufferPredicate Funcref.
 "   1.20.014	03-Sep-2012	ENH: Implement a:options.complete = 'b' (only
 "				supporting single-line matches and no
 "				a:options.extractor).
@@ -67,6 +69,9 @@
 "				used match text, not object.
 "	001	13-Aug-2008	file creation
 
+function! s:ShouldBeSearched( options, bufnr )
+    return ! has_key(a:options, 'bufferPredicate') || call(a:options.bufferPredicate, [a:bufnr])
+endfunction
 function! CompleteHelper#ExtractText( startPos, endPos, ... )
 "*******************************************************************************
 "* PURPOSE:
@@ -131,6 +136,9 @@ function! s:FindMatchesInCurrentWindow( alreadySearchedBuffers, matches, pattern
 	return
     endif
     let a:alreadySearchedBuffers[bufnr('')] = 1
+    if ! s:ShouldBeSearched(a:options, bufnr(''))
+	return
+    endif
 
     let l:isBackward = has_key(a:options, 'backward_search')
 
@@ -168,8 +176,9 @@ function! s:FindMatchesInCurrentWindow( alreadySearchedBuffers, matches, pattern
 endfunction
 function! s:FindMatchesInOtherWindows( alreadySearchedBuffers, matches, pattern, options )
     let l:originalWinNr = winnr()
-    if winnr('$') == 1 && has_key(a:alreadySearchedBuffers, winbufnr(l:originalWinNr)
-	return  " There's only one window, and we have searched it already (probably via s:FindMatchesInCurrentWindow()).
+    if winnr('$') == 1 && has_key(a:alreadySearchedBuffers, winbufnr(l:originalWinNr))
+	" There's only one window, and we have searched it already (probably via s:FindMatchesInCurrentWindow()).
+	return
     endif
 
     " By entering a window, its height is potentially increased from 0 to 1 (the
@@ -190,7 +199,7 @@ function! s:FindMatchesInOtherWindows( alreadySearchedBuffers, matches, pattern,
 
     try
 	for l:winNr in range(1, winnr('$'))
-	    if ! has_key(a:alreadySearchedBuffers, winbufnr(l:winNr))
+	    if ! has_key(a:alreadySearchedBuffers, winbufnr(l:winNr)) && s:ShouldBeSearched(a:options, winbufnr(l:winNr))
 		execute 'noautocmd' l:winNr . 'wincmd w'
 
 		let l:matchTemplate = {'menu': bufname('')}
@@ -219,6 +228,10 @@ function! s:FindMatchesInOtherBuffers( alreadySearchedBuffers, matches, pattern,
 	    return
 	endif
 	let a:alreadySearchedBuffers[l:bufnr] = 1
+	if ! s:ShouldBeSearched(a:options, l:bufnr)
+	    return
+	endif
+
 	let l:matchTemplate = {'menu': bufname(l:bufnr)}
 
 	" We need to get all lines at once; there is no other way to remotely
@@ -279,20 +292,23 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 "			    loaded buffers from the buffer list.
 "   a:options.backward_search	Flag whether to search backwards from the cursor
 "				position.
-"   a:options.extractor	    Function reference that extracts the matched text
-"			    from the current buffer. Will be invoked with
-"			    ([startLine, startCol], [endLine, endCol], matchObj)
-"			    arguments with the cursor positioned at the start of
-"			    the current match; must return string; can modify
-"			    the initial matchObj.
+"   a:options.extractor	    Funcref that extracts the matched text from the
+"			    current buffer. Will be invoked with ([startLine,
+"			    startCol], [endLine, endCol], matchObj) arguments
+"			    with the cursor positioned at the start of the
+"			    current match; must return string; can modify the
+"			    initial matchObj.
 "			    Note: Is not used for a:options.complete = 'b'.
-"   a:options.processor	    Function reference that processes matches. Will be
-"			    invoked with an a:matchText argument; must return
-"			    processed string, or empty string if the match
-"			    should be discarded. Alternatively, you can filter()
-"			    / map() the a:matches result returned from this
-"			    function, but passing in a function may be easier
-"			    for you.
+"   a:options.processor	    Funcref that processes matches. Will be invoked with
+"			    an a:matchText argument; must return processed
+"			    string, or empty string if the match should be
+"			    discarded. Alternatively, you can filter() / map()
+"			    the a:matches result returned from this function,
+"			    but passing in a function may be easier for you.
+"   a:options.bufferPredicate   Funcref that decides whether a particular buffer
+"				should be searched. It is passed a buffer number
+"				and must return 0 when the buffer should be
+"				skipped.
 "* RETURN VALUES:
 "   a:matches
 "*******************************************************************************
