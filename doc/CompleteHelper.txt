@@ -30,6 +30,8 @@ AlphaComplete:		Completes any sequence of alphabetic characters.
 
 BidiComplete:		Considers text before AND AFTER the cursor.
 
+BufNameComplete:	Completes filenames loaded in Vim.
+
 CamelCaseComplete:	Expands CamelCaseWords and underscore_words based on
 (vimscript #3915)	anchor characters for each word fragment.
 
@@ -171,6 +173,9 @@ IDEAS							*CompleteHelper-ideas*
 
 ==============================================================================
 HISTORY						      *CompleteHelper-history*
+
+1.31
+- Truncate to a bit less than half of Vim's width.
 
 1.30	27-Sep-2012
 - ENH: Allow skipping of buffers via new a:options.bufferPredicate Funcref.
