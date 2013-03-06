@@ -174,8 +174,14 @@ IDEAS							*CompleteHelper-ideas*
 ==============================================================================
 HISTORY						      *CompleteHelper-history*
 
-1.31
+1.31	06-Mar-2013
 - Truncate to a bit less than half of Vim's width.
+- Avoid "E11: Invalid in command-line window" error when performing
+  completions that search other windows from the command-line window. Use the
+  buffer-search instead; it does not need to change the current window for its
+  search.
+- FIX: Don't abort iteration of buffers in s:FindMatchesInOtherBuffers() when
+  one buffer was already searched; instead :continue with the next.
 
 1.30	27-Sep-2012
 - ENH: Allow skipping of buffers via new a:options.bufferPredicate Funcref.
@@ -210,7 +216,7 @@ First published version.
 Started development.
 
 ==============================================================================
-Copyright: (C) 2008-2012 Ingo Karkat
+Copyright: (C) 2008-2013 Ingo Karkat
 The VIM LICENSE applies to this script; see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>
