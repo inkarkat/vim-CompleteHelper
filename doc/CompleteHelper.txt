@@ -174,8 +174,10 @@ IDEAS							*CompleteHelper-ideas*
 ==============================================================================
 HISTORY						      *CompleteHelper-history*
 
-1.31	06-Mar-2013
-- Truncate to a bit less than half of Vim's width.
+1.31	07-Mar-2013
+- Truncate to a bit less than half of Vim's width because the popup menu
+  spacing as well as fold, number and sign columns further reduce the
+  available space.
 - Avoid "E11: Invalid in command-line window" error when performing
   completions that search other windows from the command-line window. Use the
   buffer-search instead; it does not need to change the current window for its
