@@ -1,3 +1,4 @@
+autoload/escapings.vim
 autoload/CompleteHelper.vim
 autoload/CompleteHelper/Abbreviate.vim
 autoload/CompleteHelper/Repeat.vim
