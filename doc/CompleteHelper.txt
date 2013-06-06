@@ -72,6 +72,12 @@ SnippetComplete:	Completes defined abbreviations and other snippets.
 
 WORDComplete:	    	Completes an entire sequence of non-blank characters.
 
+RELATED WORKS								     *
+
+- Mark Weber's vim-addon-completion library
+  (https://github.com/MarcWeber/vim-addon-completion) has some functions to
+  switch between completions and to do CamelCase matching.
+
 ==============================================================================
 USAGE							*CompleteHelper-usage*
 
