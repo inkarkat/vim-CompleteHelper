@@ -11,7 +11,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.31.016	06-Mar-2013	Avoid "E11: Invalid in command-line window"
+"   1.31.016	07-Mar-2013	Avoid "E11: Invalid in command-line window"
 "				error when performing completions that search
 "				other windows from the command-line window. Use
 "				the buffer-search instead; it does not need to
@@ -331,8 +331,10 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 		" In the command-line window, we cannot temporarily leave it to
 		" search in other windows: "E11: Invalid in command-line
 		" window". Work around this by performing the buffer search for
-		" those visible buffers.
-		call s:FindMatchesInOtherBuffers(l:searchedBuffers, a:matches, a:pattern, a:options, tabpagebuflist())
+		" those visible buffers. (Unless a custom extractor is used.)
+		if ! has_key(a:options, 'extractor')
+		    call s:FindMatchesInOtherBuffers(l:searchedBuffers, a:matches, a:pattern, a:options, tabpagebuflist())
+		endif
 	    else
 		call s:FindMatchesInOtherWindows(l:searchedBuffers, a:matches, a:pattern, a:options)
 	    endif
