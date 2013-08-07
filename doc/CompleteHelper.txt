@@ -29,6 +29,7 @@ The following custom completions use this plugin:
 AlphaComplete:		Completes any sequence of alphabetic characters.
 
 BidiComplete:		Considers text before AND AFTER the cursor.
+(vimscript #4658)
 
 BufNameComplete:	Completes filenames loaded in Vim.
 
@@ -40,6 +41,8 @@ CustomKeywordComplete:	Expands keywords from a sequence of contained
 
 LongestComplete:	Completes based on the longest possible text before
 			the cursor.
+
+MiddleEndComplete:	Completes base matches in the middle or end.
 
 MinLengthComplete:	Only offers completions that add more than n
 			characters.
