@@ -1,7 +1,7 @@
 " CompleteHelper.vim: Generic functions to support custom insert mode completions.
 "
 " DEPENDENCIES:
-"   - escapings.vim autoload script
+"   - ingo/compat.vim autoload script
 "   - CompleteHelper/Abbreviate.vim autoload script for
 "     CompleteHelper#Abbreviate()
 "
@@ -11,6 +11,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.32.017	08-Aug-2013	Move escapings.vim into ingo-library.
 "   1.31.016	07-Mar-2013	Avoid "E11: Invalid in command-line window"
 "				error when performing completions that search
 "				other windows from the command-line window. Use
@@ -221,7 +222,7 @@ function! s:FindMatchesInOtherWindows( alreadySearchedBuffers, matches, pattern,
 
 	let &autochdir = l:save_autochdir
 	if getcwd() !=# l:save_cwd
-	    execute l:chdirCommand escapings#fnameescape(l:save_cwd)
+	    execute l:chdirCommand ingo#compat#fnameescape(l:save_cwd)
 	endif
     endtry
 endfunction
