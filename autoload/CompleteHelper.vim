@@ -314,7 +314,9 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 "			    string, or empty string if the match should be
 "			    discarded. Alternatively, you can filter() / map()
 "			    the a:matches result returned from this function,
-"			    but passing in a function may be easier for you.
+"			    but passing in a function may be easier for you (and
+"			    may avoid that a lot of duplicates consume memory
+"			    unnecessarily).
 "   a:options.bufferPredicate   Funcref that decides whether a particular buffer
 "				should be searched. It is passed a buffer number
 "				and must return 0 when the buffer should be
