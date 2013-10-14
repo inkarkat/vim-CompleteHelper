@@ -39,6 +39,9 @@ CamelCaseComplete:	Expands CamelCaseWords and underscore_words based on
 CustomKeywordComplete:	Expands keywords from a sequence of contained
 			characters.
 
+InnerFragmentComplete:	Completes (and expands CamelCaseWord) fragments inside
+			words.
+
 LongestComplete:	Completes based on the longest possible text before
 			the cursor.
 
