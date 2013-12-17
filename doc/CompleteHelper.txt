@@ -188,12 +188,13 @@ IDEAS							*CompleteHelper-ideas*
 ==============================================================================
 HISTORY						      *CompleteHelper-history*
 
-1.32	RELEASEME
+1.32	14-Dec-2013
 - ENH: Allow to pass a List of regular expressions to
   CompleteHelper#FindMatches(). If you have multiple regular expressions that
   can match at the same position and should yield separate matches, you cannot
   use regular expression branches.
-- Add dependency to ingo-library (vimscript #4433).
+- Add dependency to ingo-library (vimscript #4433). *** You need to separately
+  install ingo-library (vimscript #4433) version 1.014 (or higher)! ***
 
 1.31	07-Mar-2013
 - Truncate to a bit less than half of Vim's width because the popup menu
