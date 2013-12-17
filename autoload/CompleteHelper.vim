@@ -2,6 +2,7 @@
 "
 " DEPENDENCIES:
 "   - ingo/compat.vim autoload script
+"   - ingo/list.vim autoload script
 "   - CompleteHelper/Abbreviate.vim autoload script for
 "     CompleteHelper#Abbreviate()
 "
@@ -11,6 +12,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.32.019	15-Oct-2013	Replace conditional with ingo#list#Make().
 "   1.32.018	02-Oct-2013	ENH: Allow to pass a List of regular expressions
 "				to CompleteHelper#FindMatches(). If you have
 "				multiple regular expressions that can match at
@@ -339,7 +341,7 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 "   a:matches
 "*******************************************************************************
     let l:complete = get(a:options, 'complete', '')
-    let l:patterns = (type(a:pattern) == type([]) ? a:pattern : [a:pattern])
+    let l:patterns = ingo#list#Make(a:pattern)
     let l:searchedBuffers = {}
     for l:places in split(l:complete, ',')
 	if l:places ==# '.'
