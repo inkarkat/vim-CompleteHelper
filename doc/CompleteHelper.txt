@@ -188,6 +188,10 @@ IDEAS							*CompleteHelper-ideas*
 ==============================================================================
 HISTORY						      *CompleteHelper-history*
 
+1.33	RELEASEME
+- Remove the duplicated implementation in CompleteHelper#ExtractText(),
+  deprecate it, and delegate to ingo#text#Get().
+
 1.32	14-Dec-2013
 - ENH: Allow to pass a List of regular expressions to
   CompleteHelper#FindMatches(). If you have multiple regular expressions that
