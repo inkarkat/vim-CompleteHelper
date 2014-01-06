@@ -3,6 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/compat.vim autoload script
 "   - ingo/list.vim autoload script
+"   - ingo/text.vim autoload script
 "   - CompleteHelper/Abbreviate.vim autoload script for
 "     CompleteHelper#Abbreviate()
 "
@@ -12,6 +13,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.33.020	18-Dec-2013	Remove the duplicated implementation in
+"				CompleteHelper#ExtractText(), deprecate it, and
+"				delegate to ingo#text#Get().
 "   1.32.019	15-Oct-2013	Replace conditional with ingo#list#Make().
 "   1.32.018	02-Oct-2013	ENH: Allow to pass a List of regular expressions
 "				to CompleteHelper#FindMatches(). If you have
@@ -92,45 +96,10 @@ function! s:ShouldBeSearched( options, bufnr )
 endfunction
 function! CompleteHelper#ExtractText( startPos, endPos, ... )
 "*******************************************************************************
-"* PURPOSE:
-"   Extract the text between a:startPos and a:endPos from the current buffer.
-"   Multiple lines will be delimited by a newline character.
-"* ASSUMPTIONS / PRECONDITIONS:
-"   none
-"* EFFECTS / POSTCONDITIONS:
-"   none
-"* INPUTS:
-"   a:startPos	    [line,col]
-"   a:endPos	    [line,col]
-"   a:matchObj	    The match object to be returned to the completion function.
-"		    This function does not need to set anything there, the
-"		    mandatory matchObj.word will be set from this function's
-"		    return value automatically (and with additional processing).
-"		    However, you _can_ modify other items if you deem necessary.
-"		    (E.g. add a note to matchObj.menu that the text was
-"		    truncated.)
-"* RETURN VALUES:
-"   string text; return an empty string to signal that no match should be added
-"   to the list of matches.
+"* DEPRECATED:
+"   Use ingo#text#Get() instead.
 "*******************************************************************************
-    let [l:line, l:column] = a:startPos
-    let [l:endLine, l:endColumn] = a:endPos
-    if l:line > l:endLine || (l:line == l:endLine && l:column > l:endColumn)
-	return ''
-    endif
-
-    let l:text = ''
-    while 1
-	if l:line == l:endLine
-	    let l:text .= matchstr( getline(l:line) . "\n", '\%' . l:column . 'c' . '.*\%' . (l:endColumn + 1) . 'c' )
-	    break
-	else
-	    let l:text .= matchstr( getline(l:line) . "\n", '\%' . l:column . 'c' . '.*' )
-	    let l:line += 1
-	    let l:column = 1
-	endif
-    endwhile
-    return l:text
+    return ingo#text#Get(a:startPos, a:endPos)
 endfunction
 function! s:AddMatch( matches, matchObj, matchText, options )
     let l:matchText = a:matchText
@@ -185,7 +154,7 @@ function! s:FindMatchesInCurrentWindow( alreadySearchedBuffers, matches, pattern
 
 	    " Initialize the match object and extract the match text.
 	    let l:matchObj = copy(a:matchTemplate)
-	    let l:matchText = (has_key(a:options, 'extractor') ? a:options.extractor(l:matchPos, l:matchEndPos, l:matchObj) : CompleteHelper#ExtractText(l:matchPos, l:matchEndPos))
+	    let l:matchText = (has_key(a:options, 'extractor') ? a:options.extractor(l:matchPos, l:matchEndPos, l:matchObj) : ingo#text#Get(l:matchPos, l:matchEndPos))
 
 	    call s:AddMatch(a:matches, l:matchObj, l:matchText, a:options)
 "****D echomsg '**** match from' string(l:matchPos) 'to' string(l:matchEndPos) l:matchText
