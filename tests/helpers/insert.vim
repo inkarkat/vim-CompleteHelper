@@ -15,15 +15,27 @@ function! Insert( base, idx )
 endfunction
 function! InsertRepeat( base, ... )
     stopinsert
-    let l:base = a:base
+    execute 'normal! a' . a:base . "\<Esc>"
+
+    " XXX: Somehow, CompleteHelper's CursorMovedI autocmd isn't fired; we need
+    " to do this ourselves, first to set the record at the start of the base.
+    let l:save_virtualedit=&virtualedit
+    set virtualedit=onemore
+	normal! l
+	    call InnerFragmentComplete#Expr()
+	    let l:startCol = call(&completefunc, [1, ''])
+	    call cursor(0, l:startCol + 1)
+	    call CompleteHelper#Repeat#SetRecord()
+	normal! $
+    let &virtualedit = l:save_virtualedit
+
 
     for l:idx in a:000
-	let l:keys = 'a' . l:base . s:CompletionKeys(l:idx) . "\<Esc>"
-	let l:base = ''
+	let l:keys = 'a' . s:CompletionKeys(l:idx) . "\<Esc>"
 	execute 'normal' l:keys
 
 	" XXX: Somehow, CompleteHelper's CursorMovedI autocmd isn't fired; we
-	" need to do this ourselves.
+	" need to do this ourselves, now to set the record after completion.
 	let l:save_virtualedit=&virtualedit
 	set virtualedit=onemore
 	    normal! l
