@@ -7,12 +7,16 @@ function! SetCompletion( completeMapping )
 endfunction
 function! IsMatchesAtCursor( isAppend, base, expectedMatches, description )
     " Test completion at the current cursor position. 
+	normal! mz
     execute 'normal' (a:isAppend ? 'a' : 'i') . a:base
+	if exists('g:isSelectBase')
+	    execute "normal! vg`zo\<Esc>"
+	endif
     let l:startCol = call(&completefunc, [1, ''])
     let l:base = strpart(getline('.'), l:startCol, (col('.') - l:startCol) + a:isAppend)
     let l:completions = call(&completefunc, [0, l:base])
     let l:actualMatches = map(l:completions, 'v:val.word')
-
+"****D echomsg '****' string(l:actualMatches)
     call vimtap#collections#IsSet(l:actualMatches, a:expectedMatches, a:description)
 endfunction
 
