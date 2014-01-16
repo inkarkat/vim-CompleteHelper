@@ -7,12 +7,24 @@
 "   - CompleteHelper/Abbreviate.vim autoload script for
 "     CompleteHelper#Abbreviate()
 "
-" Copyright: (C) 2008-2013 Ingo Karkat
+" Copyright: (C) 2008-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.33.021	07-Jan-2014	FIX: a:options.backward_search with falsy value
+"				also enables backward search.
+"				Add g:CompleteHelper_IsDefaultToBackwardSearch
+"				config var that lets
+"				CompleteHelper#FindMatches() default to
+"				backwards search when no
+"				a:options.backward_search is given. Since all of
+"				my custom completions don't offer separate
+"				backward / forward mappings, and backward search
+"				(i.e. offering first what got recently typed)
+"				makes more sense, default to backward search
+"				from now on.
 "   1.33.020	18-Dec-2013	Remove the duplicated implementation in
 "				CompleteHelper#ExtractText(), deprecate it, and
 "				delegate to ingo#text#Get().
@@ -90,6 +102,12 @@
 "	002	17-Aug-2008	BF: Check for match not yet in the list still
 "				used match text, not object.
 "	001	13-Aug-2008	file creation
+let s:save_cpo = &cpo
+set cpo&vim
+
+if ! exists('g:CompleteHelper_IsDefaultToBackwardSearch')
+    let g:CompleteHelper_IsDefaultToBackwardSearch = 1
+endif
 
 function! s:ShouldBeSearched( options, bufnr )
     return ! has_key(a:options, 'bufferPredicate') || call(a:options.bufferPredicate, [a:bufnr])
@@ -127,7 +145,10 @@ function! s:FindMatchesInCurrentWindow( alreadySearchedBuffers, matches, pattern
 	return
     endif
 
-    let l:isBackward = has_key(a:options, 'backward_search')
+    let l:isBackward = (has_key(a:options, 'backward_search') ?
+    \   a:options.backward_search :
+    \   g:CompleteHelper_IsDefaultToBackwardSearch
+    \)
 
     let l:save_cursor = getpos('.')
 
@@ -357,4 +378,6 @@ function! CompleteHelper#JoinMultiline( text )
     return (stridx(a:text, "\n") == -1 ? a:text : substitute(a:text, "\\%(\\s*\n\\)\\+\\s*", ' ', 'g'))
 endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
