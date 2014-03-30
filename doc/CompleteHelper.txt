@@ -6,6 +6,7 @@ description			|CompleteHelper-description|
 usage				|CompleteHelper-usage|
 example				|CompleteHelper-example|
 installation			|CompleteHelper-installation|
+configuration			|CompleteHelper-configuration|
 limitations			|CompleteHelper-limitations|
 known problems			|CompleteHelper-known-problems|
 todo				|CompleteHelper-todo|
@@ -167,6 +168,18 @@ DEPENDENCIES					 *CompleteHelper-dependencies*
 - Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.014 or
   higher.
 
+CONFIGURATION					*CompleteHelper-configuration*
+
+For a permanent configuration, put the following commands into your |vimrc|:
+				  *g:CompleteHelper_IsDefaultToBackwardSearch*
+When no a:options.backward_search is passed to CompleteHelper#FindMatches(),
+it defaults to backwards search, as this offers recent / preceding matches
+(which are likier to be recalled) first. If you don't want that, either
+explicitly pass the a:options.backward_search flag (especially do this if you
+offer both backward and forward matching mappings), or globally revert to the
+previous behavior via: >
+    let g:CompleteHelper_IsDefaultToBackwardSearch = 0
+<
 ==============================================================================
 LIMITATIONS					  *CompleteHelper-limitations*
 
@@ -191,6 +204,14 @@ HISTORY						      *CompleteHelper-history*
 1.33	RELEASEME
 - Remove the duplicated implementation in CompleteHelper#ExtractText(),
   deprecate it, and delegate to ingo#text#Get().
+- FIX: a:options.backward_search with falsy value also enables backward
+  search.
+- Add g:CompleteHelper_IsDefaultToBackwardSearch config var that lets
+  CompleteHelper#FindMatches() default to backwards search when no
+  a:options.backward_search is given. Since all of my custom completions don't
+  offer separate backward / forward mappings, and backward search (i.e.
+  offering first what got recently typed) makes more sense, default to
+  backward search from now on.
 
 1.32	14-Dec-2013
 - ENH: Allow to pass a List of regular expressions to
@@ -244,7 +265,7 @@ First published version.
 Started development.
 
 ==============================================================================
-Copyright: (C) 2008-2013 Ingo Karkat
+Copyright: (C) 2008-2014 Ingo Karkat
 The VIM LICENSE applies to this plugin; see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>
