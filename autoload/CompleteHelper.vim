@@ -13,6 +13,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.33.022	17-Jan-2014	Check for existence of 'autochdir'.
 "   1.33.021	07-Jan-2014	FIX: a:options.backward_search with falsy value
 "				also enables backward search.
 "				Add g:CompleteHelper_IsDefaultToBackwardSearch
@@ -204,8 +205,10 @@ function! s:FindMatchesInOtherWindows( alreadySearchedBuffers, matches, patterns
     " The 'autochdir' option adapts the CWD, so any (relative) filepath to the
     " filename in the other window would be omitted. Temporarily turn this off;
     " may be a little bit faster, too.
-    let l:save_autochdir = &autochdir
-    set noautochdir
+    if exists('+autochdir')
+	let l:save_autochdir = &autochdir
+	set noautochdir
+    endif
 
     try
 	for l:winNr in range(1, winnr('$'))
@@ -220,7 +223,9 @@ function! s:FindMatchesInOtherWindows( alreadySearchedBuffers, matches, patterns
 	execute 'noautocmd' l:originalWinNr . 'wincmd w'
 	silent! execute l:originalWindowLayout
 
-	let &autochdir = l:save_autochdir
+	if exists('l:save_autochdir')
+	    let &autochdir = l:save_autochdir
+	endif
 	if getcwd() !=# l:save_cwd
 	    execute l:chdirCommand ingo#compat#fnameescape(l:save_cwd)
 	endif
