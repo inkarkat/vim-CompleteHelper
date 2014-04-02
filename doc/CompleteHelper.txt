@@ -43,6 +43,9 @@ CustomKeywordComplete:	Expands keywords from a sequence of contained
 InnerFragmentComplete:	Completes (and expands CamelCaseWord) fragments inside
 (vimscript #4804)	words.
 
+LineComplete:		Completes entire lines with looser matching that the
+			built-in |i_CTRL-X_CTRL-L|.
+
 LongestComplete:	Completes based on the longest possible text before
 			the cursor.
 
