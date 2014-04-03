@@ -127,6 +127,14 @@ Some built-in completions support the repetition of a completion, so that
 subsequent words from the completion source are appended. This function allows
 to implement such a repetition for custom completions, too.
 
+DEBUGGING					    *CompleteHelper-debugging*
+
+To help you with developing your own plugins, you can make the plugin save the
+last used pattern(s) in a global variable, if it is defined: >
+    :let g:CompleteHelper_DebugPatterns = []
+    " Trigger custom completion.
+    :echo g:CompleteHelper_DebugPatterns
+<
 ==============================================================================
 EXAMPLE						      *CompleteHelper-example*
 
@@ -215,6 +223,7 @@ HISTORY						      *CompleteHelper-history*
   offer separate backward / forward mappings, and backward search (i.e.
   offering first what got recently typed) makes more sense, default to
   backward search from now on.
+- Allow to debug the pattern via :let g:CompleteHelper_DebugPatterns = [].
 
 1.32	14-Dec-2013
 - ENH: Allow to pass a List of regular expressions to
