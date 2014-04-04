@@ -54,7 +54,19 @@ function! CompleteHelper#Repeat#TestForRepeat()
 endfunction
 
 function! CompleteHelper#Repeat#Processor( text )
-    return substitute(a:text, '^\s*\n\s*', ' ', '')
+    " Condense a new line and the following indent to a single space to give a
+    " continuous completion repeat just like the built-in repeat does.
+    let l:textWithoutNewline = substitute(a:text, '^\s*\n\s*', ' ', '')
+
+    if l:textWithoutNewline !=# a:text
+	" Because the completion candidate that will be inserted now differs
+	" from the original match (there's no newline and indent any more),
+	" further repeats wouldn't find any matches.
+echomsg '####' string(s:startPos) '->' string(s:lastPos)
+	let s:startPos = [s:lastPos[0], s:lastPos[1] + 1]
+    endif
+
+    return l:textWithoutNewline
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
