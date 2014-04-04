@@ -28,7 +28,7 @@ SEE ALSO								     *
 The following custom completions use this plugin:
 
 AlphaComplete:		Completes any sequence of alphabetic characters.
-
+(vimscript #4912)
 BidiComplete:		Considers text before AND AFTER the cursor.
 (vimscript #4658)
 
@@ -44,7 +44,7 @@ InnerFragmentComplete:	Completes (and expands CamelCaseWord) fragments inside
 (vimscript #4804)	words.
 
 LineComplete:		Completes entire lines with looser matching that the
-			built-in |i_CTRL-X_CTRL-L|.
+(vimscript #4911)	built-in |i_CTRL-X_CTRL-L|.
 
 LongestComplete:	Completes based on the longest possible text before
 			the cursor.
