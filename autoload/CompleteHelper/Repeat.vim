@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/text.vim autoload script
 "
-" Copyright: (C) 2011-2013 Ingo Karkat
+" Copyright: (C) 2011-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -21,6 +21,9 @@ let s:lastPos = []
 let s:repeatCnt = 0
 function! CompleteHelper#Repeat#SetRecord()
     let s:record = s:Record()
+endfunction
+function! CompleteHelper#Repeat#Clear()
+    let s:record = []
 endfunction
 function! s:Record()
     return [tabpagenr(), winnr(), bufnr(''), b:changedtick, &completefunc] + getpos('.')
@@ -48,6 +51,10 @@ function! CompleteHelper#Repeat#TestForRepeat()
 	let s:repeatCnt = 0
 	return [0, '', '']
     endif
+endfunction
+
+function! CompleteHelper#Repeat#Processor( text )
+    return substitute(a:text, '^\s*\n\s*', ' ', '')
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
