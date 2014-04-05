@@ -49,6 +49,14 @@ function! CompleteHelper#Repeat#TestForRepeat()
 
     let l:pos = getpos('.')[1:2]
     if s:record == s:Record()
+	if exists('s:moveStart')
+	    let s:previousText .= ingo#text#Get(s:startPos, [s:lastPos[0], s:lastPos[1] - 1]) . s:moveStart
+echomsg '****' string(s:previousText) string(s:startPos) '->' string(s:lastPos)
+	    let l:newPos = [s:lastPos[0], s:lastPos[1] + 1] " I18N Note: Okay to simply add one to get to the character after the last completed match, as this will always be a Space character.
+	    let s:startPos = l:newPos
+	    unlet s:moveStart
+	endif
+
 	let s:repeatCnt += 1
 	let l:bpos = [l:pos[0], l:pos[1] - 1]
 
@@ -56,9 +64,11 @@ function! CompleteHelper#Repeat#TestForRepeat()
 	let s:lastPos = l:pos
 
 	let l:fullText = ingo#text#Get(s:startPos, l:bpos)
+
 	return [s:repeatCnt, l:addedText, s:previousText . l:fullText]
     else
 	let s:record = []
+	unlet! s:moveStart
 	let s:previousText = ''
 	let l:base = call(&completefunc, [1, ''])
 	let s:startPos = [line('.'), l:base + 1]
@@ -83,9 +93,8 @@ function! CompleteHelper#Repeat#Processor( text )
 	" additional s:previousText assertion. This one needs to include the
 	" newline (which is included in the grabbed text area) and any leading
 	" indent before the text match in the new line.
-	let s:previousText .= ingo#text#Get(s:startPos, s:lastPos) . matchstr(a:text, '^\s*\n\zs\_s*')
-echomsg '****' string(a:text) string(s:previousText) string(s:startPos) '->' string(s:lastPos)
-	let s:startPos = l:newPos
+	"let s:moveStart = ingo#text#Get(s:startPos, s:lastPos) . matchstr(a:text, '^\s*\n\zs\_s*')
+	let s:moveStart = matchstr(a:text, '^\s*\n\_s*')
     endif
 
     return l:textWithoutNewline
