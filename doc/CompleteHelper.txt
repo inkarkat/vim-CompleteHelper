@@ -212,7 +212,7 @@ IDEAS							*CompleteHelper-ideas*
 ==============================================================================
 HISTORY						      *CompleteHelper-history*
 
-1.33	RELEASEME
+1.40	RELEASEME
 - Remove the duplicated implementation in CompleteHelper#ExtractText(),
   deprecate it, and delegate to ingo#text#Get().
 - FIX: a:options.backward_search with falsy value also enables backward
@@ -224,6 +224,10 @@ HISTORY						      *CompleteHelper-history*
   offering first what got recently typed) makes more sense, default to
   backward search from now on.
 - Allow to debug the pattern via :let g:CompleteHelper_DebugPatterns = [].
+- Allow completion repeats to continue repeating from following lines like the
+  built-in completions do: The newline plus any indent is removed, and just
+  the first word from the following line is matched. For this, the
+  CompleteHelper#Repeat#Processor() is offered.
 
 1.32	14-Dec-2013
 - ENH: Allow to pass a List of regular expressions to
