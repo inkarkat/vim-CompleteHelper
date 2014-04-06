@@ -1,6 +1,7 @@
 " CompleteHelper/Repeat.vim: Generic functions to support repetition of custom insert mode completions.
 "
 " DEPENDENCIES:
+"   - ingo/msg.vim autoload script
 "   - ingo/text.vim autoload script
 "
 " Copyright: (C) 2011-2014 Ingo Karkat
@@ -13,7 +14,10 @@
 "				built-in behavior: Keep trailing whitespace,
 "				only condense the newline and indent. Also
 "				condense a newline when it's inside a match, not
-"				just at the front.
+"				just at the front. The built-in completion only
+"				skips across a single newline (plus indent);
+"				else truncate / discard the match and issue the
+"				same error message.
 "   1.40.005	06-Apr-2014	I18N: Correctly handle repeats of (text ending
 "				with a) multi-byte character: Instead of just
 "				subtracting one from the column, ask for an
@@ -94,9 +98,17 @@ function! CompleteHelper#Repeat#TestForRepeat()
 endfunction
 
 function! CompleteHelper#Repeat#Processor( text )
+    if a:text =~# '\n\s*\n'
+	" The built-in completion only skips across a single newline (plus
+	" indent); else truncate / discard the match and issue the same error
+	" message.
+	call ingo#msg#ErrorMsg('Hit end of paragraph')
+	return matchstr(a:text, '^\%(\n\@!.\)*')
+    endif
+
     " Condense a new line and the following indent to a single space to give a
     " continuous completion repeat just like the built-in repeat does.
-    let l:textWithoutNewline = substitute(a:text, '^\%(\n\@!.\)*\zs\n\s*\n\@!', ' ', '')
+    let l:textWithoutNewline = substitute(a:text, '^.*\zs\n\s*', ' ', '')
 
     if l:textWithoutNewline !=# a:text
 	" Because the completion candidate that will be inserted now differs
