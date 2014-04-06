@@ -9,6 +9,11 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.40.006	07-Apr-2014	Align the multi-line completion with Vim's
+"				built-in behavior: Keep trailing whitespace,
+"				only condense the newline and indent. Also
+"				condense a newline when it's inside a match, not
+"				just at the front.
 "   1.40.005	06-Apr-2014	I18N: Correctly handle repeats of (text ending
 "				with a) multi-byte character: Instead of just
 "				subtracting one from the column, ask for an
@@ -60,7 +65,10 @@ function! CompleteHelper#Repeat#TestForRepeat()
 	    " so far completed text in s:previousText.
 	    let s:previousText .= ingo#text#Get(s:startPos, s:lastPos, 1) . s:moveStart
 "****D echomsg '****' string(s:previousText) string(s:startPos) '->' string(s:lastPos)
-	    let l:newPos = [s:lastPos[0], s:lastPos[1] + 1] " I18N Note: Okay to simply add one to get to the character after the last completed match, as this will always be a Space character.
+	    " Move the start column by the length of the moved string plus the
+	    " single space, minus the newline and indent condensed into the
+	    " space.
+	    let l:newPos = [s:lastPos[0], s:lastPos[1] + len(s:moveStart) + len(' ') - len(matchstr(s:moveStart, '\n\s*'))]
 	    let s:startPos = l:newPos
 	    unlet s:moveStart
 	endif
@@ -71,7 +79,7 @@ function! CompleteHelper#Repeat#TestForRepeat()
 	let s:lastPos = l:pos
 
 	let l:fullText = ingo#text#Get(s:startPos, l:pos, 1)
-
+"****D echomsg '****' string([s:repeatCnt, l:addedText, s:previousText . l:fullText])
 	return [s:repeatCnt, l:addedText, s:previousText . l:fullText]
     else
 	let s:record = []
@@ -88,7 +96,7 @@ endfunction
 function! CompleteHelper#Repeat#Processor( text )
     " Condense a new line and the following indent to a single space to give a
     " continuous completion repeat just like the built-in repeat does.
-    let l:textWithoutNewline = substitute(a:text, '^\s*\n\_s*', ' ', '')
+    let l:textWithoutNewline = substitute(a:text, '^.*\zs\n\s*', ' ', '')
 
     if l:textWithoutNewline !=# a:text
 	" Because the completion candidate that will be inserted now differs
@@ -103,7 +111,7 @@ function! CompleteHelper#Repeat#Processor( text )
 	" record the removed whitespace here and do the actual shifting of the
 	" text and positions on the next invocation of
 	" CompleteHelper#Repeat#TestForRepeat().
-	let s:moveStart = matchstr(a:text, '^\s*\n\_s*')
+	let s:moveStart = matchstr(a:text, '^.*\n\s*')
     endif
 
     return l:textWithoutNewline
