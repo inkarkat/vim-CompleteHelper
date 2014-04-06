@@ -96,7 +96,7 @@ endfunction
 function! CompleteHelper#Repeat#Processor( text )
     " Condense a new line and the following indent to a single space to give a
     " continuous completion repeat just like the built-in repeat does.
-    let l:textWithoutNewline = substitute(a:text, '^.*\zs\n\s*', ' ', '')
+    let l:textWithoutNewline = substitute(a:text, '^\%(\n\@!.\)*\zs\n\s*\n\@!', ' ', '')
 
     if l:textWithoutNewline !=# a:text
 	" Because the completion candidate that will be inserted now differs
