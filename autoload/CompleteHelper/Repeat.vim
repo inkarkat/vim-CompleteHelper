@@ -67,17 +67,16 @@ function! CompleteHelper#Repeat#TestForRepeat()
 
 	if exists('s:moveStart')
 	    let l:moveStart = get(s:moveStart, l:addedText, '')
-echomsg '****' string(l:addedText) string(s:moveStart)
 	    if ! empty(l:moveStart)
-		" The inserted completion candidate differs in the whitespace (no
-		" newline and indent) from the original match position. To maintain
-		" the match, move the start position forward and instead store the
-		" so far completed text in s:previousText.
+		" The inserted completion candidate differs in the whitespace
+		" (no newline and indent) from the original match position. To
+		" maintain the match, move the start position forward and
+		" instead store the so far completed text in s:previousText.
 		let s:previousText .= ingo#text#Get(s:startPos, s:lastPos, 1) . l:moveStart
-echomsg '****' string(s:previousText) string(s:startPos) '->' string(s:lastPos)
-		" Move the start column by the length of the moved string plus the
-		" single space, minus the newline and indent condensed into the
-		" space.
+"****D echomsg '****' string(s:previousText) string(s:startPos) '->' string(s:lastPos)
+		" Move the start column by the length of the moved string plus
+		" the single space, minus the newline and indent condensed into
+		" the space.
 		let l:newPos = [s:lastPos[0], s:lastPos[1] + len(l:moveStart) + len(' ') - len(matchstr(l:moveStart, '\n\s*'))]
 		let s:startPos = l:newPos
 	    endif
@@ -126,15 +125,16 @@ function! CompleteHelper#Repeat#Processor( text )
 	" newline and any leading indent before the text match in the new line.
 	" Since this processor function is possibly invoked multiple times and
 	" not in the buffer where the completion has been triggered, we just
-	" record the removed whitespace here and do the actual shifting of the
-	" text and positions on the next invocation of
-	" CompleteHelper#Repeat#TestForRepeat().
+	" record the removed whitespace here (keyed by the actual processed
+	" match text) and do the actual shifting of the text and positions on
+	" the next invocation of CompleteHelper#Repeat#TestForRepeat(), when it
+	" is known (via l:addedText) which candidate has been inserted.
 	if ! exists('s:moveStart')
 	    let s:moveStart = {}
 	endif
 	if ! has_key(s:moveStart, l:textWithoutNewline)
 	    let s:moveStart[l:textWithoutNewline] = matchstr(a:text, '^.*\n\s*')
-	else | echomsg '**** override' string(strtrans(s:moveStart[l:textWithoutNewline])) string(a:text)
+"****D	else | echomsg '**** override' string(strtrans(s:moveStart[l:textWithoutNewline])) string(a:text)
 	endif
     endif
 
