@@ -231,6 +231,10 @@ HISTORY						      *CompleteHelper-history*
 - I18N: Correctly handle repeats of (text ending with a) multi-byte character:
   Instead of just subtracting one from the column, ask for an end-exclusive
   text grab from ingo#text#Get().
+- Add CompleteHelper#Repeat#GetPattern() to encapsulate the common assembly of
+  the repeat pattern, especially the complex expressions with negative and
+  positive character expressions to emulate Vim's built-in completion repeat
+  behavior.
   *** You need to update to ingo-library (vimscript #4433) version 1.018! ***
 
 1.32	14-Dec-2013
