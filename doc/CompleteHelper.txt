@@ -212,7 +212,7 @@ IDEAS							*CompleteHelper-ideas*
 ==============================================================================
 HISTORY						      *CompleteHelper-history*
 
-1.40	RELEASEME
+1.40	16-Apr-2014
 - Remove the duplicated implementation in CompleteHelper#ExtractText(),
   deprecate it, and delegate to ingo#text#Get().
 - FIX: a:options.backward_search with falsy value also enables backward
