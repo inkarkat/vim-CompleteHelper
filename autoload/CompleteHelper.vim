@@ -13,7 +13,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.33.023	03-Apr-2014	Allow to debug the pattern via :let
+"   1.40.023	03-Apr-2014	Allow to debug the pattern via :let
 "				g:CompleteHelper_DebugPatterns = [].
 "   1.33.022	17-Jan-2014	Check for existence of 'autochdir'.
 "   1.33.021	07-Jan-2014	FIX: a:options.backward_search with falsy value
@@ -339,7 +339,13 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 "*******************************************************************************
     let l:complete = get(a:options, 'complete', '')
     let l:patterns = ingo#list#Make(a:pattern)
-    if exists('g:CompleteHelper_DebugPatterns') | let g:CompleteHelper_DebugPatterns = l:patterns | endif
+    if exists('g:CompleteHelper_DebugPatterns')
+	if type(g:CompleteHelper_DebugPatterns) == type([])
+	    let g:CompleteHelper_DebugPatterns = l:patterns
+	else
+	    echomsg '****' string(l:patterns)
+	endif
+    endif
     let l:searchedBuffers = {}
     for l:places in split(l:complete, ',')
 	if l:places ==# '.'
