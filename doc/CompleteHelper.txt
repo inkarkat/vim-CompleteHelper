@@ -97,7 +97,7 @@ directory.
 
 CompleteHelper#FindMatches( matches, pattern, options )
 
-The main helper functions that finds all matches of a:pattern in buffers
+The main helper function that finds all matches of a:pattern in buffers
 specified by a:options, and returns them in the List a:matches that can be
 returned as-is to Vim.
 
