@@ -212,7 +212,7 @@ IDEAS							*CompleteHelper-ideas*
 ==============================================================================
 HISTORY						      *CompleteHelper-history*
 
-1.41	RELEASEME
+1.41	31-May-2014
 - FIX: In the completion buffer, check for the cursor position being anywhere
   in the match, not just at the end. We must not only avoid matching the base,
   but any text around the cursor. This is especially important for completion
