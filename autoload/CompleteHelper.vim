@@ -192,6 +192,7 @@ function! s:FindMatchesInCurrentWindow( alreadySearchedBuffers, matches, pattern
 	    let l:matchText = (has_key(a:options, 'extractor') ? a:options.extractor(l:matchPos, l:matchEndPos, l:matchObj) : ingo#text#Get(l:matchPos, l:matchEndPos))
 
 	    call s:AddMatch(a:matches, l:matchObj, l:matchText, a:options)
+"****D echomsg '**** completion triggered from' string(l:save_cursor[1:2])
 "****D echomsg '**** match in' . (a:isInCompletionBuffer ? ' current' : '') 'buffer' bufnr('') 'from' string(l:matchPos) 'to' string(l:matchEndPos) string(l:matchText)
 	endwhile
 
