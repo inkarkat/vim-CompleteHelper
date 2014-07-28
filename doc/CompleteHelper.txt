@@ -80,6 +80,9 @@ SameFiletypeComplete:	Completion from buffers with the same filetype.
 SnippetComplete:	Completes defined abbreviations and other snippets.
 (vimscript #2926)
 
+StartEndComplete:	Completes keywords from a prefix-nonkeyword-suffix
+			base.
+
 WORDComplete:	    	Completes an entire sequence of non-blank characters.
 
 RELATED WORKS								     *
