@@ -132,7 +132,7 @@ function! CompleteHelper#ExtractText( startPos, endPos, ... )
 "*******************************************************************************
     return ingo#text#Get(a:startPos, a:endPos)
 endfunction
-function! s:AddMatch( matches, matchObj, matchText, options )
+function! CompleteHelper#AddMatch( matches, matchObj, matchText, options )
     let l:matchText = a:matchText
 
     " Custom processing of match text.
@@ -149,15 +149,7 @@ function! s:AddMatch( matches, matchObj, matchText, options )
 	call add(a:matches, a:matchObj)
     endif
 endfunction
-function! s:FindMatchesInCurrentWindow( alreadySearchedBuffers, matches, patterns, matchTemplate, options, isInCompletionBuffer )
-    if has_key(a:alreadySearchedBuffers, bufnr(''))
-	return
-    endif
-    let a:alreadySearchedBuffers[bufnr('')] = 1
-    if ! s:ShouldBeSearched(a:options, bufnr(''))
-	return
-    endif
-
+function! s:MatchInCurrent( lines, matches, matchTemplate, options, isInCompletionBuffer )
     let l:isBackward = (has_key(a:options, 'backward_search') ?
     \   a:options.backward_search :
     \   g:CompleteHelper_IsDefaultToBackwardSearch
@@ -165,7 +157,7 @@ function! s:FindMatchesInCurrentWindow( alreadySearchedBuffers, matches, pattern
 
     let l:save_cursor = getpos('.')
 
-    for l:pattern in a:patterns
+    for l:pattern in s:patterns
 	let l:firstMatchPos = [0,0]
 	while ! complete_check()
 	    let l:matchPos = searchpos( l:pattern, 'w' . (l:isBackward ? 'b' : '') )
@@ -194,7 +186,7 @@ function! s:FindMatchesInCurrentWindow( alreadySearchedBuffers, matches, pattern
 	    let l:matchObj = copy(a:matchTemplate)
 	    let l:matchText = (has_key(a:options, 'extractor') ? a:options.extractor(l:matchPos, l:matchEndPos, l:matchObj) : ingo#text#Get(l:matchPos, l:matchEndPos))
 
-	    call s:AddMatch(a:matches, l:matchObj, l:matchText, a:options)
+	    call CompleteHelper#AddMatch(a:matches, l:matchObj, l:matchText, a:options)
 "****D echomsg '**** completion triggered from' string(l:save_cursor[1:2])
 "****D echomsg '**** match in' . (a:isInCompletionBuffer ? ' current' : '') 'buffer' bufnr('') 'from' string(l:matchPos) 'to' string(l:matchEndPos) string(l:matchText)
 	endwhile
@@ -202,10 +194,21 @@ function! s:FindMatchesInCurrentWindow( alreadySearchedBuffers, matches, pattern
 	call setpos('.', l:save_cursor)
     endfor
 endfunction
-function! s:FindMatchesInOtherWindows( alreadySearchedBuffers, matches, patterns, options )
+function! s:FindInCurrentWindow( alreadySearchedBuffers, matches, Funcref, matchTemplate, options, isInCompletionBuffer )
+    if has_key(a:alreadySearchedBuffers, bufnr(''))
+	return
+    endif
+    let a:alreadySearchedBuffers[bufnr('')] = 1
+    if ! s:ShouldBeSearched(a:options, bufnr(''))
+	return
+    endif
+
+    call call(a:Funcref, [[], a:matches, a:matchTemplate, a:options, a:isInCompletionBuffer])
+endfunction
+function! s:FindInOtherWindows( alreadySearchedBuffers, matches, Funcref, options )
     let l:originalWinNr = winnr()
     if winnr('$') == 1 && has_key(a:alreadySearchedBuffers, winbufnr(l:originalWinNr))
-	" There's only one window, and we have searched it already (probably via s:FindMatchesInCurrentWindow()).
+	" There's only one window, and we have searched it already (probably via s:FindInCurrentWindow()).
 	return
     endif
 
@@ -233,7 +236,7 @@ function! s:FindMatchesInOtherWindows( alreadySearchedBuffers, matches, patterns
 		execute 'noautocmd' l:winNr . 'wincmd w'
 
 		let l:matchTemplate = {'menu': bufname('')}
-		call s:FindMatchesInCurrentWindow(a:alreadySearchedBuffers, a:matches, a:patterns, l:matchTemplate, a:options, 0)
+		call s:FindInCurrentWindow(a:alreadySearchedBuffers, a:matches, a:Funcref, l:matchTemplate, a:options, 0)
 	    endif
 	endfor
     finally
@@ -269,7 +272,30 @@ function! s:GetBufferLines( bufnr )
 	endtry
     endif
 endfunction
-function! s:FindMatchesInOtherBuffers( alreadySearchedBuffers, matches, patterns, options, bufnrs )
+function! s:MatchInBuffer( lines, matches, matchTemplate, options, isInCompletionBuffer )
+    for l:pattern in s:patterns
+	for l:line in a:lines
+	    " Note: Do not just use matchstr() with {count}, because we cannot
+	    " reliably recognize whether an empty result just means "empty match
+	    " at {count}" or actually means "no more matches".
+	    let l:endPos = 0
+	    while 1
+		let l:startPos = l:endPos
+		let l:endPos = matchend(l:line, l:pattern, l:startPos)
+		if l:endPos == -1
+		    break
+		endif
+
+		call CompleteHelper#AddMatch(a:matches, copy(a:matchTemplate), matchstr(l:line, l:pattern, l:startPos), a:options)
+	    endwhile
+	endfor
+
+	if complete_check()
+	    break
+	endif
+    endfor
+endfunction
+function! s:FindInOtherBuffers( alreadySearchedBuffers, matches, Funcref, options, bufnrs )
     for l:bufnr in a:bufnrs
 	if has_key(a:alreadySearchedBuffers, l:bufnr)
 	    continue
@@ -281,29 +307,9 @@ function! s:FindMatchesInOtherBuffers( alreadySearchedBuffers, matches, patterns
 
 	let l:matchTemplate = {'menu': bufname(l:bufnr)}
 
-	for l:pattern in a:patterns
-	    " We need to get all lines at once; there is no other way to remotely
-	    " determine the number of lines in the other buffer.
-	    for l:line in s:GetBufferLines(l:bufnr)
-		" Note: Do not just use matchstr() with {count}, because we cannot
-		" reliably recognize whether an empty result just means "empty match
-		" at {count}" or actually means "no more matches".
-		let l:endPos = 0
-		while 1
-		    let l:startPos = l:endPos
-		    let l:endPos = matchend(l:line, l:pattern, l:startPos)
-		    if l:endPos == -1
-			break
-		    endif
-
-		    call s:AddMatch(a:matches, copy(l:matchTemplate), matchstr(l:line, l:pattern, l:startPos), a:options)
-		endwhile
-	    endfor
-
-	    if complete_check()
-		break
-	    endif
-	endfor
+	" We need to get all lines at once; there is no other way to remotely
+	" determine the number of lines in the other buffer.
+	call call(a:Funcref, [s:GetBufferLines(l:bufnr), a:matches, l:matchTemplate, a:options, 0])
     endfor
 endfunction
 function! CompleteHelper#FindMatches( matches, pattern, options )
@@ -368,18 +374,18 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 "   a:matches
 "*******************************************************************************
     let l:complete = get(a:options, 'complete', '')
-    let l:patterns = ingo#list#Make(a:pattern)
+    let s:patterns = ingo#list#Make(a:pattern)
     if exists('g:CompleteHelper_DebugPatterns')
 	if type(g:CompleteHelper_DebugPatterns) == type([])
-	    let g:CompleteHelper_DebugPatterns = l:patterns
+	    let g:CompleteHelper_DebugPatterns = s:patterns
 	else
-	    echomsg '****' string(l:patterns)
+	    echomsg '****' string(s:patterns)
 	endif
     endif
     let l:searchedBuffers = {}
     for l:places in split(l:complete, ',')
 	if l:places ==# '.'
-	    call s:FindMatchesInCurrentWindow(l:searchedBuffers, a:matches, l:patterns, {}, a:options, 1)
+	    call s:FindInCurrentWindow(l:searchedBuffers, a:matches, function('s:MatchInCurrent'), {}, a:options, 1)
 	elseif l:places ==# 'w'
 	    if &l:buftype ==# 'nofile' && (bufname('') ==# (v:version < 702 ? 'command-line' : '[Command Line]') || bufname('') ==# 'option-window')
 		" In the command-line window, we cannot temporarily leave it to
@@ -387,13 +393,60 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 		" window". Work around this by performing the buffer search for
 		" those visible buffers. (Unless a custom extractor is used.)
 		if ! has_key(a:options, 'extractor')
-		    call s:FindMatchesInOtherBuffers(l:searchedBuffers, a:matches, l:patterns, a:options, tabpagebuflist())
+		    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, function('s:MatchInBuffer'), a:options, tabpagebuflist())
 		endif
 	    else
-		call s:FindMatchesInOtherWindows(l:searchedBuffers, a:matches, l:patterns, a:options)
+		call s:FindInOtherWindows(l:searchedBuffers, a:matches, function('s:MatchInCurrent'), a:options)
 	    endif
 	elseif l:places ==# 'b'
-	    call s:FindMatchesInOtherBuffers(l:searchedBuffers, a:matches, l:patterns, a:options, s:GetListedBufnrs())
+	    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, function('s:MatchInBuffer'), a:options, s:GetListedBufnrs())
+	endif
+    endfor
+    unlet s:patterns
+endfunction
+function! CompleteHelper#Find( matches, Funcref, options )
+"*******************************************************************************
+"* PURPOSE:
+"   Find matches by invoking a:Funcref with a:options and store them in
+"   a:matches.
+"* ASSUMPTIONS / PRECONDITIONS:
+"   none
+"* EFFECTS / POSTCONDITIONS:
+"   none
+"* INPUTS:
+"   a:matches	(Empty) List that will hold the matches (in Dictionary format,
+"		cp. :help complete-functions). Matches will be appended.
+"   a:options	Dictionary with Funcref configuration:
+"   a:options.complete	    Specifies what is searched, like the 'complete'
+"			    option. Supported options: '.' for current buffer,
+"			    'w' for buffers from other windows, 'b' for other
+"			    loaded buffers from the buffer list.
+"   a:options.bufferPredicate   Funcref that decides whether a particular buffer
+"				should be searched. It is passed a buffer number
+"				and must return 0 when the buffer should be
+"				skipped.
+"* RETURN VALUES:
+"   a:matches
+"*******************************************************************************
+    let l:complete = get(a:options, 'complete', '')
+    let l:searchedBuffers = {}
+    for l:places in split(l:complete, ',')
+	if l:places ==# '.'
+	    call s:FindInCurrentWindow(l:searchedBuffers, a:matches, a:Funcref, {}, a:options, 1)
+	elseif l:places ==# 'w'
+	    if &l:buftype ==# 'nofile' && (bufname('') ==# (v:version < 702 ? 'command-line' : '[Command Line]') || bufname('') ==# 'option-window')
+		" In the command-line window, we cannot temporarily leave it to
+		" search in other windows: "E11: Invalid in command-line
+		" window". Work around this by performing the buffer search for
+		" those visible buffers. (Unless a custom extractor is used.)
+		if ! has_key(a:options, 'extractor')
+		    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, a:Funcref, a:options, tabpagebuflist())
+		endif
+	    else
+		call s:FindInOtherWindows(l:searchedBuffers, a:matches, a:Funcref, a:options)
+	    endif
+	elseif l:places ==# 'b'
+	    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, a:Funcref, a:options, s:GetListedBufnrs())
 	endif
     endfor
 endfunction
