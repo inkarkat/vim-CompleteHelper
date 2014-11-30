@@ -7,10 +7,10 @@ function! SetCompletion( completeMapping )
 endfunction
 function! IsMatchesAtCursor( isAppend, base, expectedMatches, description )
     " Test completion at the current cursor position.
-	normal! mz
     execute 'normal' (a:isAppend ? 'a' : 'i') . a:base
-	if exists('g:isSelectBase')
-	    execute "normal! vg`zo\<Esc>"
+	if exists('g:SelectBase')
+	    execute "normal! vg`[o\<Esc>"
+	    execute g:SelectBase
 	endif
     let l:startCol = call(&completefunc, [1, ''])
     let l:base = strpart(getline('.'), l:startCol, (col('.') - l:startCol) + a:isAppend)
