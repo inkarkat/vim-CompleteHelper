@@ -7,13 +7,26 @@ function! SetCompletion( completeMapping )
 endfunction
 function! IsMatchesAtCursor( isAppend, base, expectedMatches, description )
     " Test completion at the current cursor position.
-    execute 'normal' (a:isAppend ? 'a' : 'i') . a:base
+    execute 'normal' (a:isAppend ? 'a' : 'i') . a:base . "\<Esc>"
 	if exists('g:SelectBase')
 	    execute "normal! vg`[o\<Esc>"
 	    execute g:SelectBase
 	endif
-    let l:startCol = call(&completefunc, [1, ''])
-    let l:base = strpart(getline('.'), l:startCol, (col('.') - l:startCol) + a:isAppend)
+    let l:col = col('.')
+
+    " Emulate cursor being to the right of the insert position, as in insert
+    " mode.
+    let l:save_virtualedit = &virtualedit
+    set virtualedit=onemore
+	normal! l
+	let l:startCol = call(&completefunc, [1, ''])
+    let &virtualedit = l:save_virtualedit
+
+    let l:line = getline('.')
+    let l:endCol = (l:col - l:startCol) + a:isAppend
+    let l:base = strpart(l:line, l:startCol, l:endCol)
+    " Remove base, as in original completion.
+    call setline('.', strpart(l:line, 0, l:startCol) . strpart(l:line, l:endCol))
     let l:completions = call(&completefunc, [0, l:base])
     let l:actualMatches = map(l:completions, 'v:val.word')
 "****D echomsg '****' string(l:actualMatches)
