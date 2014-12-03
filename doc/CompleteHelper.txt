@@ -104,6 +104,12 @@ The main helper function that finds all matches of a:pattern in buffers
 specified by a:options, and returns them in the List a:matches that can be
 returned as-is to Vim.
 
+CompleteHelper#Find( matches, Funcref, options )
+
+A generic alternative that doesn't prescribe using a regular expression match.
+Instead, a Funcref is passed to find and extract matches, reusing the window
+and buffer iteration functionality provided by this plugin.
+
 
 CompleteHelper#ExtractText( startPos, endPos, matchObj )
 
@@ -215,7 +221,16 @@ IDEAS							*CompleteHelper-ideas*
 ==============================================================================
 HISTORY						      *CompleteHelper-history*
 
-1.42	RELEASEME
+1.50	RELEASEME
+- Split the match extraction via pattern match from the window / buffer
+  iteration, which now takes a generic Funcref, allowing for other algorithms:
+  Remove ...Matches... from the s:FindMatchesIn... functions. Extract
+  s:MatchInCurrent() and s:MatchInBuffer(). Add CompleteHelper#Find() generic
+  alternative to CompleteHelper#FindMatches() that takes a Funcref instead of
+  a regular expression.
+- Expose CompleteHelper#AddMatch().
+
+1.42	27-Nov-2014
 - getbufline() can only access loaded buffers, for completion from unloaded
   buffers, we need to use readfile().
 
