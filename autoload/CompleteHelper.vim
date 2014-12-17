@@ -14,6 +14,16 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.50.026	27-Nov-2014	Split the match extraction via pattern match
+"				from the window / buffer iteration, which now
+"				takes a generic Funcref, allowing for other
+"				algorithms: Remove ...Matches... from the
+"				s:FindMatchesIn... functions. Extract
+"				s:MatchInCurrent() and s:MatchInBuffer().
+"				Add CompleteHelper#Find() generic alternative to
+"				CompleteHelper#FindMatches() that takes a
+"				Funcref instead of a regular expression.
+"				Expose CompleteHelper#AddMatch().
 "   1.42.025	29-Jul-2014	getbufline() can only access loaded buffers, for
 "				completion from unloaded buffers, we need to use
 "				readfile().
@@ -149,7 +159,7 @@ function! CompleteHelper#AddMatch( matches, matchObj, matchText, options )
 	call add(a:matches, a:matchObj)
     endif
 endfunction
-function! s:MatchInCurrent( lines, matches, matchTemplate, options, isInCompletionBuffer )
+function! s:MatchInCurrent( lines, matches, matchTemplate, options, isInCompletionWindow )
     let l:isBackward = (has_key(a:options, 'backward_search') ?
     \   a:options.backward_search :
     \   g:CompleteHelper_IsDefaultToBackwardSearch
@@ -171,7 +181,7 @@ function! s:MatchInCurrent( lines, matches, matchTemplate, options, isInCompleti
 	    endif
 
 	    let l:matchEndPos = searchpos( l:pattern, 'cen' )
-	    if a:isInCompletionBuffer && ingo#pos#IsInside(l:save_cursor[1:2], l:matchPos, l:matchEndPos)
+	    if a:isInCompletionWindow && ingo#pos#IsInside(l:save_cursor[1:2], l:matchPos, l:matchEndPos)
 		" Do not include a match around the cursor position; this would
 		" either just return the completion base, which Vim would not
 		" offer anyway, or the completion base and following text, which
@@ -188,13 +198,13 @@ function! s:MatchInCurrent( lines, matches, matchTemplate, options, isInCompleti
 
 	    call CompleteHelper#AddMatch(a:matches, l:matchObj, l:matchText, a:options)
 "****D echomsg '**** completion triggered from' string(l:save_cursor[1:2])
-"****D echomsg '**** match in' . (a:isInCompletionBuffer ? ' current' : '') 'buffer' bufnr('') 'from' string(l:matchPos) 'to' string(l:matchEndPos) string(l:matchText)
+"****D echomsg '**** match in' . (a:isInCompletionWindow ? ' current' : '') 'buffer' bufnr('') 'from' string(l:matchPos) 'to' string(l:matchEndPos) string(l:matchText)
 	endwhile
 
 	call setpos('.', l:save_cursor)
     endfor
 endfunction
-function! s:FindInCurrentWindow( alreadySearchedBuffers, matches, Funcref, matchTemplate, options, isInCompletionBuffer )
+function! s:FindInCurrentWindow( alreadySearchedBuffers, matches, Funcref, matchTemplate, options, isInCompletionWindow )
     if has_key(a:alreadySearchedBuffers, bufnr(''))
 	return
     endif
@@ -203,7 +213,7 @@ function! s:FindInCurrentWindow( alreadySearchedBuffers, matches, Funcref, match
 	return
     endif
 
-    call call(a:Funcref, [[], a:matches, a:matchTemplate, a:options, a:isInCompletionBuffer])
+    call call(a:Funcref, [[], a:matches, a:matchTemplate, a:options, a:isInCompletionWindow])
 endfunction
 function! s:FindInOtherWindows( alreadySearchedBuffers, matches, Funcref, options )
     let l:originalWinNr = winnr()
@@ -272,7 +282,7 @@ function! s:GetBufferLines( bufnr )
 	endtry
     endif
 endfunction
-function! s:MatchInBuffer( lines, matches, matchTemplate, options, isInCompletionBuffer )
+function! s:MatchInBuffer( lines, matches, matchTemplate, options, isInCompletionWindow )
     for l:pattern in s:patterns
 	for l:line in a:lines
 	    " Note: Do not just use matchstr() with {count}, because we cannot
@@ -416,6 +426,21 @@ function! CompleteHelper#Find( matches, Funcref, options )
 "* INPUTS:
 "   a:matches	(Empty) List that will hold the matches (in Dictionary format,
 "		cp. :help complete-functions). Matches will be appended.
+"   a:Funcref   Funcref that is invoked in each buffer to extract the completion
+"		matches. Is passed the following arguments:
+"		a:lines     List of lines to be searched in a buffer that
+"			    currently isn't visible in a window, or is unloaded.
+"			    If empty List, the current window should be searched
+"			    instead.
+"		a:matches   Passed through List that will hold the matches.
+"		a:matchTemplate Template object for an added match. Clone and
+"				add attributes.
+"		a:options   Passed through Dictionary with Funcref
+"			    configuration.
+"		a:isInCompletionWindow  Flag whether this is the window where
+"					the completion was originally triggered
+"					by the user (to be able to exclude
+"					matches at the cursor position).
 "   a:options	Dictionary with Funcref configuration:
 "   a:options.complete	    Specifies what is searched, like the 'complete'
 "			    option. Supported options: '.' for current buffer,
@@ -425,6 +450,8 @@ function! CompleteHelper#Find( matches, Funcref, options )
 "				should be searched. It is passed a buffer number
 "				and must return 0 when the buffer should be
 "				skipped.
+"		Other options can be added to be consumed by the Funcref, which
+"		gets these all passed.
 "* RETURN VALUES:
 "   a:matches
 "*******************************************************************************
