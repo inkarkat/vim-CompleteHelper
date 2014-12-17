@@ -72,6 +72,8 @@ PatternComplete:	Completes matches of queried {pattern} or last search
 PrevInsertComplete:	Recall and insert mode completion for previously
 (vimscript #4185)	inserted text.
 
+QuoteComplete:		Completes single-, double-, and other quoted strings.
+
 RegisterComplete:	Completes register contents.
 
 SameFiletypeComplete:	Completion from buffers with the same filetype.
