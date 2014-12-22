@@ -231,6 +231,9 @@ HISTORY						      *CompleteHelper-history*
   alternative to CompleteHelper#FindMatches() that takes a Funcref instead of
   a regular expression.
 - Expose CompleteHelper#AddMatch().
+- ENH: Add a:options.abbreviate and evaluate in CompleteHelper#AddMatch().
+  This saves completion plugins from doing an additional map() over the List
+  of matches.
 
 1.42	27-Nov-2014
 - getbufline() can only access loaded buffers, for completion from unloaded
