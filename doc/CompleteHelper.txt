@@ -40,6 +40,9 @@ CamelCaseComplete:	Expands CamelCaseWords and underscore_words based on
 CustomKeywordComplete:	Expands keywords from a sequence of contained
 			characters.
 
+EntryComplete:		Completes whole lines from designated files or
+(vimscript #5073)	buffers.
+
 InnerFragmentComplete:	Completes (and expands CamelCaseWord) fragments inside
 (vimscript #4804)	words.
 
@@ -223,10 +226,10 @@ IDEAS							*CompleteHelper-ideas*
 ==============================================================================
 HISTORY						      *CompleteHelper-history*
 
-1.50	RELEASEME
+1.50	23-Dec-2014
 - Split the match extraction via pattern match from the window / buffer
   iteration, which now takes a generic Funcref, allowing for other algorithms:
-  Remove ...Matches... from the s:FindMatchesIn... functions. Extract
+  Remove ...Matches... from the s:FindMatchesIn...() functions. Extract
   s:MatchInCurrent() and s:MatchInBuffer(). Add CompleteHelper#Find() generic
   alternative to CompleteHelper#FindMatches() that takes a Funcref instead of
   a regular expression.
