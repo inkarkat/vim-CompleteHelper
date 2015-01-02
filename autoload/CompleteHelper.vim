@@ -7,12 +7,14 @@
 "   - ingo/text.vim autoload script
 "   - CompleteHelper/Abbreviate.vim autoload script
 "
-" Copyright: (C) 2008-2014 Ingo Karkat
+" Copyright: (C) 2008-2015 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.51.028	03-Jan-2015	Backwards compatibility: haslocaldir() doesn't
+"				exist in Vim 7.0.
 "   1.50.027	18-Dec-2014	ENH: Add a:options.abbreviate and evaluate in
 "				CompleteHelper#AddMatch(). This saves completion
 "				plugins from doing an additional map() over the
@@ -237,7 +239,7 @@ function! s:FindInOtherWindows( alreadySearchedBuffers, matches, Funcref, option
     " Unfortunately, restoring the 'autochdir' option clobbers any temporary CWD
     " override. So we may have to restore the CWD, too.
     let l:save_cwd = getcwd()
-    let l:chdirCommand = (haslocaldir() ? 'lchdir!' : 'chdir!')
+    let l:chdirCommand = (exists('*haslocaldir') && haslocaldir() ? 'lchdir!' : 'chdir!')
 
     " The 'autochdir' option adapts the CWD, so any (relative) filepath to the
     " filename in the other window would be omitted. Temporarily turn this off;
