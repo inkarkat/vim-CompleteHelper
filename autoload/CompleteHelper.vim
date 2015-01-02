@@ -5,8 +5,7 @@
 "   - ingo/list.vim autoload script
 "   - ingo/pos.vim autoload script
 "   - ingo/text.vim autoload script
-"   - CompleteHelper/Abbreviate.vim autoload script for
-"     CompleteHelper#Abbreviate()
+"   - CompleteHelper/Abbreviate.vim autoload script
 "
 " Copyright: (C) 2008-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -14,6 +13,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.50.027	18-Dec-2014	ENH: Add a:options.abbreviate and evaluate in
+"				CompleteHelper#AddMatch(). This saves completion
+"				plugins from doing an additional map() over the
+"				List of matches.
 "   1.50.026	27-Nov-2014	Split the match extraction via pattern match
 "				from the window / buffer iteration, which now
 "				takes a generic Funcref, allowing for other
@@ -152,6 +155,10 @@ function! CompleteHelper#AddMatch( matches, matchObj, matchText, options )
 
     " Store match text in match object.
     let a:matchObj.word = l:matchText
+
+    if get(a:options, 'abbreviate', 0)
+	call CompleteHelper#Abbreviate#Word(a:matchObj)
+    endif
 
     " Only add if this is an actual match that is not yet in the list of
     " matches.
@@ -380,6 +387,8 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 "				should be searched. It is passed a buffer number
 "				and must return 0 when the buffer should be
 "				skipped.
+"   a:options.abbreviate        Automatically abbreviate each match with
+"				CompleteHelper#Abbreviate#Word().
 "* RETURN VALUES:
 "   a:matches
 "*******************************************************************************
