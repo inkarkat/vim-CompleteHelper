@@ -226,6 +226,13 @@ IDEAS							*CompleteHelper-ideas*
 ==============================================================================
 HISTORY						      *CompleteHelper-history*
 
+1.51	RELEASEME
+- Backwards compatibility: haslocaldir() doesn't exist in Vim 7.0.
+- FIX: Duplicate matches when the additional match info is different. Only
+  CompleteHelper#AddMatch() when the same a:match.word doesn't yet exist in
+  a:matches; a test for existence of the same a:match object isn't sufficient
+  due to the other attributes.
+
 1.50	23-Dec-2014
 - Split the match extraction via pattern match from the window / buffer
   iteration, which now takes a generic Funcref, allowing for other algorithms:
@@ -326,7 +333,7 @@ First published version.
 Started development.
 
 ==============================================================================
-Copyright: (C) 2008-2014 Ingo Karkat
+Copyright: (C) 2008-2015 Ingo Karkat
 The VIM LICENSE applies to this plugin; see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>
