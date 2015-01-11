@@ -15,6 +15,12 @@
 " REVISION	DATE		REMARKS
 "   1.51.028	03-Jan-2015	Backwards compatibility: haslocaldir() doesn't
 "				exist in Vim 7.0.
+"				FIX: Duplicate matches when the additional match
+"				info is different. Only
+"				CompleteHelper#AddMatch() when the same
+"				a:match.word doesn't yet exist in a:matches; a
+"				test for existence of the same a:match object
+"				isn't sufficient due to the other attributes.
 "   1.50.027	18-Dec-2014	ENH: Add a:options.abbreviate and evaluate in
 "				CompleteHelper#AddMatch(). This saves completion
 "				plugins from doing an additional map() over the
@@ -164,7 +170,9 @@ function! CompleteHelper#AddMatch( matches, matchObj, matchText, options )
 
     " Only add if this is an actual match that is not yet in the list of
     " matches.
-    if ! empty(l:matchText) && index(a:matches, a:matchObj) == -1
+    if ! empty(l:matchText) && index(
+    \   map(copy(a:matches), 'v:val.word'),
+    \   l:matchText) == -1
 	call add(a:matches, a:matchObj)
     endif
 endfunction
