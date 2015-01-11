@@ -13,6 +13,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.51.029	12-Jan-2015	Don't consider the current buffer when
+"				a:options.complete does not contain "."; some
+"				completions may want to explicitly exclude the
+"				current buffer.
 "   1.51.028	03-Jan-2015	Backwards compatibility: haslocaldir() doesn't
 "				exist in Vim 7.0.
 "				FIX: Duplicate matches when the additional match
@@ -143,8 +147,8 @@ if ! exists('g:CompleteHelper_IsDefaultToBackwardSearch')
     let g:CompleteHelper_IsDefaultToBackwardSearch = 1
 endif
 
-function! s:ShouldBeSearched( options, bufnr )
-    return ! has_key(a:options, 'bufferPredicate') || call(a:options.bufferPredicate, [a:bufnr])
+function! s:ShouldBeSearched( options, bufNr )
+    return ! has_key(a:options, 'bufferPredicate') || call(a:options.bufferPredicate, [a:bufNr])
 endfunction
 function! CompleteHelper#ExtractText( startPos, endPos, ... )
 "*******************************************************************************
@@ -222,11 +226,12 @@ function! s:MatchInCurrent( lines, matches, matchTemplate, options, isInCompleti
     endfor
 endfunction
 function! s:FindInCurrentWindow( alreadySearchedBuffers, matches, Funcref, matchTemplate, options, isInCompletionWindow )
-    if has_key(a:alreadySearchedBuffers, bufnr(''))
+    let l:originalBufNr = bufnr('')
+    if has_key(a:alreadySearchedBuffers, l:originalBufNr)
 	return
     endif
-    let a:alreadySearchedBuffers[bufnr('')] = 1
-    if ! s:ShouldBeSearched(a:options, bufnr(''))
+    let a:alreadySearchedBuffers[l:originalBufNr] = 1
+    if ! s:ShouldBeSearched(a:options, l:originalBufNr)
 	return
     endif
 
@@ -234,7 +239,8 @@ function! s:FindInCurrentWindow( alreadySearchedBuffers, matches, Funcref, match
 endfunction
 function! s:FindInOtherWindows( alreadySearchedBuffers, matches, Funcref, options )
     let l:originalWinNr = winnr()
-    if winnr('$') == 1 && has_key(a:alreadySearchedBuffers, winbufnr(l:originalWinNr))
+    let l:originalBufNr = bufnr('')
+    if winnr('$') == 1 && has_key(a:alreadySearchedBuffers, l:originalBufNr)
 	" There's only one window, and we have searched it already (probably via s:FindInCurrentWindow()).
 	return
     endif
@@ -259,7 +265,10 @@ function! s:FindInOtherWindows( alreadySearchedBuffers, matches, Funcref, option
 
     try
 	for l:winNr in range(1, winnr('$'))
-	    if ! has_key(a:alreadySearchedBuffers, winbufnr(l:winNr)) && s:ShouldBeSearched(a:options, winbufnr(l:winNr))
+	    let l:bufNr = winbufnr(l:winNr)
+	    if l:bufNr != l:originalBufNr &&
+	    \   ! has_key(a:alreadySearchedBuffers, l:bufNr) &&
+	    \   s:ShouldBeSearched(a:options, l:bufNr)
 		execute 'noautocmd' l:winNr . 'wincmd w'
 
 		let l:matchTemplate = {'menu': bufname('')}
@@ -284,16 +293,16 @@ function! s:GetListedBufnrs()
     \   'buflisted(v:val)'
     \)
 endfunction
-function! s:GetBufferLines( bufnr )
-    if bufloaded(a:bufnr)
-	return getbufline(a:bufnr, 1, '$')
+function! s:GetBufferLines( bufNr )
+    if bufloaded(a:bufNr)
+	return getbufline(a:bufNr, 1, '$')
     else
 	" getbufline() can only access loaded buffers, for unloaded ones, we
 	" need to use readfile(). This has the downside of not considering the
 	" file's encoding, but Vim's built-in completion (in version 7.4.316)
 	" doesn't, neither (presumably because it also uses readfile()).
 	try
-	    return readfile(bufname(a:bufnr))
+	    return readfile(bufname(a:bufNr))
 	catch /^Vim\%((\a\+)\)\=:E484/ " E484: Can't open file
 	    return []
 	endtry
@@ -323,20 +332,21 @@ function! s:MatchInBuffer( lines, matches, matchTemplate, options, isInCompletio
     endfor
 endfunction
 function! s:FindInOtherBuffers( alreadySearchedBuffers, matches, Funcref, options, bufnrs )
-    for l:bufnr in a:bufnrs
-	if has_key(a:alreadySearchedBuffers, l:bufnr)
+    let l:originalBufNr = bufnr('')
+    for l:bufNr in a:bufnrs
+	if l:bufNr == l:originalBufNr || has_key(a:alreadySearchedBuffers, l:bufNr)
 	    continue
 	endif
-	let a:alreadySearchedBuffers[l:bufnr] = 1
-	if ! s:ShouldBeSearched(a:options, l:bufnr)
+	let a:alreadySearchedBuffers[l:bufNr] = 1
+	if ! s:ShouldBeSearched(a:options, l:bufNr)
 	    continue
 	endif
 
-	let l:matchTemplate = {'menu': bufname(l:bufnr)}
+	let l:matchTemplate = {'menu': bufname(l:bufNr)}
 
 	" We need to get all lines at once; there is no other way to remotely
 	" determine the number of lines in the other buffer.
-	call call(a:Funcref, [s:GetBufferLines(l:bufnr), a:matches, l:matchTemplate, a:options, 0])
+	call call(a:Funcref, [s:GetBufferLines(l:bufNr), a:matches, l:matchTemplate, a:options, 0])
     endfor
 endfunction
 function! CompleteHelper#FindMatches( matches, pattern, options )
