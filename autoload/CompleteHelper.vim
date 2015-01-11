@@ -17,6 +17,12 @@
 "				a:options.complete does not contain "."; some
 "				completions may want to explicitly exclude the
 "				current buffer.
+"				CHG: Exclude unloaded buffers from
+"				a:options.complete = "b" and introduce "u"
+"				option value for those.
+"				Add "U" option value for unlisted (loaded and
+"				unloaded) buffers, like in the built-in
+"				'complete' option.
 "   1.51.028	03-Jan-2015	Backwards compatibility: haslocaldir() doesn't
 "				exist in Vim 7.0.
 "				FIX: Duplicate matches when the additional match
@@ -287,10 +293,10 @@ function! s:FindInOtherWindows( alreadySearchedBuffers, matches, Funcref, option
 	endif
     endtry
 endfunction
-function! s:GetListedBufnrs()
+function! s:GetBufNrs( expr )
     return filter(
     \   range(1, bufnr('$')),
-    \   'buflisted(v:val)'
+    \   a:expr
     \)
 endfunction
 function! s:GetBufferLines( bufNr )
@@ -331,9 +337,9 @@ function! s:MatchInBuffer( lines, matches, matchTemplate, options, isInCompletio
 	endif
     endfor
 endfunction
-function! s:FindInOtherBuffers( alreadySearchedBuffers, matches, Funcref, options, bufnrs )
+function! s:FindInOtherBuffers( alreadySearchedBuffers, matches, Funcref, options, bufNrs )
     let l:originalBufNr = bufnr('')
-    for l:bufNr in a:bufnrs
+    for l:bufNr in a:bufNrs
 	if l:bufNr == l:originalBufNr || has_key(a:alreadySearchedBuffers, l:bufNr)
 	    continue
 	endif
@@ -383,9 +389,12 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 "		within single lines.
 "   a:options	Dictionary with match configuration:
 "   a:options.complete	    Specifies what is searched, like the 'complete'
-"			    option. Supported options: '.' for current buffer,
-"			    'w' for buffers from other windows, 'b' for other
-"			    loaded buffers from the buffer list.
+"			    option. Supported options:
+"			    - "." current buffer
+"			    - "w" buffers from other windows
+"			    - "b" other loaded buffers that are in the buffer list
+"			    - "u" unloaded buffers that are in the buffer list
+"			    - "U" buffers that are not in the buffer list
 "   a:options.backward_search	Flag whether to search backwards from the cursor
 "				position.
 "   a:options.extractor	    Funcref that extracts the matched text from the
@@ -438,7 +447,11 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 		call s:FindInOtherWindows(l:searchedBuffers, a:matches, function('s:MatchInCurrent'), a:options)
 	    endif
 	elseif l:places ==# 'b'
-	    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, function('s:MatchInBuffer'), a:options, s:GetListedBufnrs())
+	    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, function('s:MatchInBuffer'), a:options, s:GetBufNrs('buflisted(v:val) && bufloaded(v:val)'))
+	elseif l:places ==# 'u'
+	    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, function('s:MatchInBuffer'), a:options, s:GetBufNrs('buflisted(v:val) && ! bufloaded(v:val)'))
+	elseif l:places ==# 'U'
+	    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, function('s:MatchInBuffer'), a:options, s:GetBufNrs('! buflisted(v:val)'))
 	endif
     endfor
     unlet s:patterns
@@ -472,9 +485,12 @@ function! CompleteHelper#Find( matches, Funcref, options )
 "					matches at the cursor position).
 "   a:options	Dictionary with Funcref configuration:
 "   a:options.complete	    Specifies what is searched, like the 'complete'
-"			    option. Supported options: '.' for current buffer,
-"			    'w' for buffers from other windows, 'b' for other
-"			    loaded buffers from the buffer list.
+"			    option. Supported options:
+"			    - "." current buffer
+"			    - "w" buffers from other windows
+"			    - "b" other loaded buffers that are in the buffer list
+"			    - "u" unloaded buffers that are in the buffer list
+"			    - "U" buffers that are not in the buffer list
 "   a:options.bufferPredicate   Funcref that decides whether a particular buffer
 "				should be searched. It is passed a buffer number
 "				and must return 0 when the buffer should be
@@ -502,7 +518,11 @@ function! CompleteHelper#Find( matches, Funcref, options )
 		call s:FindInOtherWindows(l:searchedBuffers, a:matches, a:Funcref, a:options)
 	    endif
 	elseif l:places ==# 'b'
-	    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, a:Funcref, a:options, s:GetListedBufnrs())
+	    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, a:Funcref, a:options, s:GetBufNrs('buflisted(v:val) && bufloaded(v:val)'))
+	elseif l:places ==# 'u'
+	    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, a:Funcref, a:options, s:GetBufNrs('buflisted(v:val) && ! bufloaded(v:val)'))
+	elseif l:places ==# 'U'
+	    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, a:Funcref, a:options, s:GetBufNrs('! buflisted(v:val)'))
 	endif
     endfor
 endfunction
