@@ -23,6 +23,11 @@
 "				Add "U" option value for unlisted (loaded and
 "				unloaded) buffers, like in the built-in
 "				'complete' option.
+"				DWIM: Check for a:options.extractor and then
+"				skip incompatible a:options.complete values.
+"				This allows MotionComplete.vim plugins to
+"				default to 'complete' values and prevents user
+"				misconfiguration.
 "   1.51.028	03-Jan-2015	Backwards compatibility: haslocaldir() doesn't
 "				exist in Vim 7.0.
 "				FIX: Duplicate matches when the additional match
@@ -403,7 +408,8 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 "			    with the cursor positioned at the start of the
 "			    current match; must return string; can modify the
 "			    initial matchObj.
-"			    Note: Is not used for a:options.complete = 'b'.
+"			    Note: When this is set, only the following
+"			    a:options.complete are used: "." and "w".
 "   a:options.processor	    Funcref that processes matches. Will be invoked with
 "			    an a:matchText argument; must return processed
 "			    string, or empty string if the match should be
@@ -430,6 +436,7 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 	    echomsg '****' string(s:patterns)
 	endif
     endif
+    let l:isStandardExtraction = ! has_key(a:options, 'extractor')
     let l:searchedBuffers = {}
     for l:places in split(l:complete, ',')
 	if l:places ==# '.'
@@ -440,17 +447,17 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 		" search in other windows: "E11: Invalid in command-line
 		" window". Work around this by performing the buffer search for
 		" those visible buffers. (Unless a custom extractor is used.)
-		if ! has_key(a:options, 'extractor')
+		if l:isStandardExtraction
 		    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, function('s:MatchInBuffer'), a:options, tabpagebuflist())
 		endif
 	    else
 		call s:FindInOtherWindows(l:searchedBuffers, a:matches, function('s:MatchInCurrent'), a:options)
 	    endif
-	elseif l:places ==# 'b'
+	elseif l:places ==# 'b' && l:isStandardExtraction
 	    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, function('s:MatchInBuffer'), a:options, s:GetBufNrs('buflisted(v:val) && bufloaded(v:val)'))
-	elseif l:places ==# 'u'
+	elseif l:places ==# 'u' && l:isStandardExtraction
 	    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, function('s:MatchInBuffer'), a:options, s:GetBufNrs('buflisted(v:val) && ! bufloaded(v:val)'))
-	elseif l:places ==# 'U'
+	elseif l:places ==# 'U' && l:isStandardExtraction
 	    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, function('s:MatchInBuffer'), a:options, s:GetBufNrs('! buflisted(v:val)'))
 	endif
     endfor
