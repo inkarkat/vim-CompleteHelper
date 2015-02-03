@@ -28,6 +28,12 @@
 "				This allows MotionComplete.vim plugins to
 "				default to 'complete' values and prevents user
 "				misconfiguration.
+"				FIX: Also consider buffers from windows visible
+"				in other tab pages (by collecting their buffer
+"				numbers, not by actually visiting each tab
+"				page). This matters when a:options.complete does
+"				not contain "b" (or "u" when unlisted buffers
+"				are shown in a window).
 "   1.51.028	03-Jan-2015	Backwards compatibility: haslocaldir() doesn't
 "				exist in Vim 7.0.
 "				FIX: Duplicate matches when the additional match
@@ -453,6 +459,18 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 	    else
 		call s:FindInOtherWindows(l:searchedBuffers, a:matches, function('s:MatchInCurrent'), a:options)
 	    endif
+
+	    if tabpagenr('$') > 1 && l:isStandardExtraction
+		" Instead of visiting all the tab pages, determine the
+		" corresponding buffer numbers and search those. The only
+		" downside is that it won't work with a custom extractor.
+		let l:bufNrsInOtherTabPages = []
+		for l:i in filter(range(1, tabpagenr('$')), 'v:val != ' . tabpagenr())
+		    call extend(l:bufNrsInOtherTabPages, tabpagebuflist(l:i))
+		endfor
+
+		call s:FindInOtherBuffers(l:searchedBuffers, a:matches, function('s:MatchInBuffer'), a:options, l:bufNrsInOtherTabPages)
+	    endif
 	elseif l:places ==# 'b' && l:isStandardExtraction
 	    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, function('s:MatchInBuffer'), a:options, s:GetBufNrs('buflisted(v:val) && bufloaded(v:val)'))
 	elseif l:places ==# 'u' && l:isStandardExtraction
@@ -523,6 +541,18 @@ function! CompleteHelper#Find( matches, Funcref, options )
 		endif
 	    else
 		call s:FindInOtherWindows(l:searchedBuffers, a:matches, a:Funcref, a:options)
+	    endif
+
+	    if tabpagenr('$') > 1 && l:isStandardExtraction
+		" Instead of visiting all the tab pages, determine the
+		" corresponding buffer numbers and search those. The only
+		" downside is that it won't work with a custom extractor.
+		let l:bufNrsInOtherTabPages = []
+		for l:i in filter(range(1, tabpagenr('$')), 'v:val != ' . tabpagenr())
+		    call extend(l:bufNrsInOtherTabPages, tabpagebuflist(l:i))
+		endfor
+
+		call s:FindInOtherBuffers(l:searchedBuffers, a:matches, a:Funcref, a:options, l:bufNrsInOtherTabPages)
 	    endif
 	elseif l:places ==# 'b'
 	    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, a:Funcref, a:options, s:GetBufNrs('buflisted(v:val) && bufloaded(v:val)'))
