@@ -13,6 +13,12 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.51.030	04-Feb-2015	Regression: CompleteHelper#Find() causes "E121:
+"				Undefined variable: l:isStandardExtraction. The
+"				!has_key(a:options, 'extractor') condition isn't
+"				needed in this clone of
+"				CompleteHelper#FindMatches(), as there's no
+"				a:options.extractor property.
 "   1.51.029	12-Jan-2015	Don't consider the current buffer when
 "				a:options.complete does not contain "."; some
 "				completions may want to explicitly exclude the
@@ -535,18 +541,15 @@ function! CompleteHelper#Find( matches, Funcref, options )
 		" In the command-line window, we cannot temporarily leave it to
 		" search in other windows: "E11: Invalid in command-line
 		" window". Work around this by performing the buffer search for
-		" those visible buffers. (Unless a custom extractor is used.)
-		if ! has_key(a:options, 'extractor')
-		    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, a:Funcref, a:options, tabpagebuflist())
-		endif
+		" those visible buffers.
+		call s:FindInOtherBuffers(l:searchedBuffers, a:matches, a:Funcref, a:options, tabpagebuflist())
 	    else
 		call s:FindInOtherWindows(l:searchedBuffers, a:matches, a:Funcref, a:options)
 	    endif
 
-	    if tabpagenr('$') > 1 && l:isStandardExtraction
+	    if tabpagenr('$') > 1
 		" Instead of visiting all the tab pages, determine the
-		" corresponding buffer numbers and search those. The only
-		" downside is that it won't work with a custom extractor.
+		" corresponding buffer numbers and search those.
 		let l:bufNrsInOtherTabPages = []
 		for l:i in filter(range(1, tabpagenr('$')), 'v:val != ' . tabpagenr())
 		    call extend(l:bufNrsInOtherTabPages, tabpagebuflist(l:i))
