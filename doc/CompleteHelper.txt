@@ -255,6 +255,8 @@ HISTORY						      *CompleteHelper-history*
   collecting their buffer numbers, not by actually visiting each tab page).
   This matters when a:options.complete does not contain "b" (or "u" when
   unlisted buffers are shown in a window).
+- ENH: Keep previous (last accessed) window when searching through them for
+  matches.
 
 1.50	23-Dec-2014
 - Split the match extraction via pattern match from the window / buffer
