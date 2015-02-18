@@ -21,12 +21,13 @@ function! InsertRepeat( base, ... )
     " to do this ourselves, first to set the record at the start of the base.
     let l:save_virtualedit=&virtualedit
     set virtualedit=onemore
+	let l:save_cursor = getpos('.')
 	normal! l
 	    call InnerFragmentComplete#Expr()
 	    let l:startCol = call(&completefunc, [1, ''])
 	    call cursor(0, l:startCol + 1)
 	    call CompleteHelper#Repeat#SetRecord()
-	normal! $
+	call setpos('.', l:save_cursor)
     let &virtualedit = l:save_virtualedit
 
 
