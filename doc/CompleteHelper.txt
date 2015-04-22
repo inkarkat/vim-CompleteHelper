@@ -86,6 +86,7 @@ SnippetComplete:	Completes defined abbreviations and other snippets.
 (vimscript #2926)
 
 SpecialLocationComplete:Completes special, configurable custom patterns.
+(vimscript #5120)
 
 StartEndComplete:	Completes keywords from a prefix-nonkeyword-suffix
 			base.
