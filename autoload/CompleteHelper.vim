@@ -13,6 +13,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.51.031	07-Feb-2015	ENH: Keep previous (last accessed) window when
+"				searching through them for matches.
 "   1.51.030	04-Feb-2015	Regression: CompleteHelper#Find() causes "E121:
 "				Undefined variable: l:isStandardExtraction. The
 "				!has_key(a:options, 'extractor') condition isn't
@@ -262,6 +264,7 @@ function! s:FindInCurrentWindow( alreadySearchedBuffers, matches, Funcref, match
 endfunction
 function! s:FindInOtherWindows( alreadySearchedBuffers, matches, Funcref, options )
     let l:originalWinNr = winnr()
+    let l:previousWinNr = winnr('#') ? winnr('#') : 1
     let l:originalBufNr = bufnr('')
     if winnr('$') == 1 && has_key(a:alreadySearchedBuffers, l:originalBufNr)
 	" There's only one window, and we have searched it already (probably via s:FindInCurrentWindow()).
@@ -299,7 +302,8 @@ function! s:FindInOtherWindows( alreadySearchedBuffers, matches, Funcref, option
 	    endif
 	endfor
     finally
-	execute 'noautocmd' l:originalWinNr . 'wincmd w'
+	noautocmd execute l:previousWinNr . 'wincmd w'
+	noautocmd execute l:originalWinNr . 'wincmd w'
 	silent! execute l:originalWindowLayout
 
 	if exists('l:save_autochdir')
