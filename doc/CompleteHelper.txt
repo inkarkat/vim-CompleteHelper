@@ -239,7 +239,7 @@ IDEAS							*CompleteHelper-ideas*
 ==============================================================================
 HISTORY						      *CompleteHelper-history*
 
-1.51	RELEASEME
+1.51	23-Apr-2015
 - Backwards compatibility: haslocaldir() doesn't exist in Vim 7.0.
 - FIX: Duplicate matches when the additional match info is different. Only
   CompleteHelper#AddMatch() when the same a:match.word doesn't yet exist in
