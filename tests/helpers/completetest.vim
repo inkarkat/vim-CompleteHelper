@@ -5,7 +5,7 @@ function! SetCompletion( completeMapping )
     normal! Gdd
     set completefunc?
 endfunction
-function! IsMatchesAtCursor( isAppend, base, expectedMatches, description )
+function! GetMatchesAtCursor( isAppend, base )
     " Test completion at the current cursor position.
     execute 'normal' (a:isAppend ? 'a' : 'i') . a:base . "\<Esc>"
 	if exists('g:SelectBase')
@@ -30,9 +30,20 @@ function! IsMatchesAtCursor( isAppend, base, expectedMatches, description )
     let l:completions = call(&completefunc, [0, l:base])
     let l:actualMatches = map(l:completions, 'v:val.word')
 "****D echomsg '****' string(l:actualMatches)
+    return l:actualMatches
+endfunction
+function! IsMatchesAtCursor( isAppend, base, expectedMatches, description )
+    let l:actualMatches = GetMatchesAtCursor(a:isAppend, a:base)
     call vimtap#collections#IsSet(l:actualMatches, a:expectedMatches, a:description)
 endfunction
 
+function! GetMatchesInIsolatedLine( base )
+    " Test completion in a temporary empty line at the end of the buffer.
+    normal! Go
+    let l:actualMatches = GetMatchesAtCursor(1, a:base)
+    normal! Gdd
+    return l:actualMatches
+endfunction
 function! IsMatchesInIsolatedLine( base, expectedMatches, description )
     " Test completion in a temporary empty line at the end of the buffer.
     normal! Go
@@ -40,6 +51,15 @@ function! IsMatchesInIsolatedLine( base, expectedMatches, description )
     normal! Gdd
 endfunction
 
+function! GetMatchesInContext( prefix, postfix, base )
+    " Test completion in a temporary line at the end of the buffer in the middle
+    " of a:prefix and a:postfix.
+    call setline(line('$') + 1, a:prefix . a:postfix)
+    call cursor(line('$'), len(a:prefix) + 1)
+    let l:actualMatches = GetMatchesAtCursor((len(a:postfix) == 0), a:base)
+    normal! Gdd
+    return l:actualMatches
+endfunction
 function! IsMatchesInContext( prefix, postfix, base, expectedMatches, description )
     " Test completion in a temporary line at the end of the buffer in the middle
     " of a:prefix and a:postfix.
