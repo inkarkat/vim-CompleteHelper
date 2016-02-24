@@ -10,6 +10,12 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.40.007	09-Apr-2014	Add CompleteHelper#Repeat#GetPattern() to
+"				encapsulate the common assembly of the repeat
+"				pattern, especially the complex expressions with
+"				negative and positive character expressions to
+"				emulate Vim's built-in completion repeat
+"				behavior.
 "   1.40.006	07-Apr-2014	Align the multi-line completion with Vim's
 "				built-in behavior: Keep trailing whitespace,
 "				only condense the newline and indent. Also
@@ -41,6 +47,8 @@
 "   1.11.002	01-Sep-2012	Make a:matchObj in CompleteHelper#ExtractText()
 "				optional; it's not used there, anyway.
 "   1.00.001	09-Oct-2011	file creation
+let s:save_cpo = &cpo
+set cpo&vim
 
 let s:record = []
 let s:startPos = []
@@ -102,6 +110,22 @@ function! CompleteHelper#Repeat#TestForRepeat()
     endif
 endfunction
 
+function! CompleteHelper#Repeat#GetPattern( fullText, ... )
+    let l:anchorExpr = (a:0 >= 1 ? a:1 : '\<')
+    let l:positiveExpr = (a:0 >= 2 ? a:2 : '\k')
+    let l:negativeExpr = (a:0 >= 3 ? a:3 : printf('\%%(%s\@!\.\)', l:positiveExpr))
+
+    " Need to translate the embedded ^@ newline into the \n atom.
+    let l:previousCompleteExpr = substitute(escape(a:fullText, '\'), '\n', '\\n', 'g')
+
+    return printf('\V%s%s\zs\%%(%s\+%s\+\|\_s\+%s\*%s\+\|\_s\*%s\+\)',
+    \   l:anchorExpr,
+    \   l:previousCompleteExpr,
+    \   l:negativeExpr, l:positiveExpr,
+    \   l:negativeExpr, l:positiveExpr,
+    \   l:negativeExpr
+    \)
+endfunction
 function! CompleteHelper#Repeat#Processor( text )
     if a:text =~# '\n\s*\n'
 	" The built-in completion only skips across a single newline (plus
@@ -141,4 +165,6 @@ function! CompleteHelper#Repeat#Processor( text )
     return l:textWithoutNewline
 endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
