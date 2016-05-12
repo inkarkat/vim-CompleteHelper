@@ -3,12 +3,15 @@
 " DEPENDENCIES:
 "   - ingo/avoidprompt.vim autoload script
 "
-" Copyright: (C) 2012-2013 Ingo Karkat
+" Copyright: (C) 2012-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.52.006	13-May-2016	CompleteHelper#Abbreviate#Word(): Only offer the
+"				full word in the preview window if
+"				a:matchObj.info hasn't been set yet.
 "   1.32.005	07-Jun-2013	Move EchoWithoutScrolling.vim into ingo-library.
 "   1.31.003	16-Nov-2012	Truncate to a bit less than half of Vim's width.
 "   1.10.002	05-May-2012	ENH: Offer full completion word in the preview
@@ -88,7 +91,7 @@ function! CompleteHelper#Abbreviate#Word( matchObj )
 	" fine through the translation of newlines.
 	let l:hasInternalMultiLine = (a:matchObj.word =~# '\n\@!.\n\n\@!.')
 	let l:wasTruncated = l:translatedWord !=# l:abbr
-	if l:hasInternalMultiLine || l:wasTruncated
+	if (l:hasInternalMultiLine || l:wasTruncated) && empty(get(a:matchObj, 'info', ''))
 	    " Offer the full (possibly multi-line) word for showing in the preview
 	    " window.
 	    let a:matchObj.info = a:matchObj.word
