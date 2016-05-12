@@ -239,6 +239,10 @@ IDEAS							*CompleteHelper-ideas*
 ==============================================================================
 HISTORY						      *CompleteHelper-history*
 
+1.52	RELEASEME
+- Need to restore entire view, not just the cursor position when matching in
+  the current window. Else, a completion may change the current view.
+
 1.51	23-Apr-2015
 - Backwards compatibility: haslocaldir() doesn't exist in Vim 7.0.
 - FIX: Duplicate matches when the additional match info is different. Only
