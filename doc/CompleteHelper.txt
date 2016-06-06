@@ -242,6 +242,8 @@ HISTORY						      *CompleteHelper-history*
 1.52	RELEASEME
 - Need to restore entire view, not just the cursor position when matching in
   the current window. Else, a completion may change the current view.
+- CompleteHelper#Abbreviate#Word(): Only offer the full word in the preview
+  window if a:matchObj.info hasn't been set yet.
 
 1.51	23-Apr-2015
 - Backwards compatibility: haslocaldir() doesn't exist in Vim 7.0.
@@ -365,7 +367,7 @@ First published version.
 Started development.
 
 ==============================================================================
-Copyright: (C) 2008-2015 Ingo Karkat
+Copyright: (C) 2008-2016 Ingo Karkat
 The VIM LICENSE applies to this plugin; see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>
