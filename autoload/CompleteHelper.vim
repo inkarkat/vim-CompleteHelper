@@ -13,6 +13,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.52.032	29-May-2015	Need to restore entire view, not just the cursor
+"				position when matching in the current window.
+"				Else, a completion may change the current view.
+"				(Custom a:Funcref need to do such themselves.)
 "   1.51.031	07-Feb-2015	ENH: Keep previous (last accessed) window when
 "				searching through them for matches.
 "   1.51.030	04-Feb-2015	Regression: CompleteHelper#Find() causes "E121:
@@ -211,7 +215,8 @@ function! s:MatchInCurrent( lines, matches, matchTemplate, options, isInCompleti
     \   g:CompleteHelper_IsDefaultToBackwardSearch
     \)
 
-    let l:save_cursor = getpos('.')
+    let l:save_view = winsaveview()
+    let l:cursor = getpos('.')[1:2]
 
     for l:pattern in s:patterns
 	let l:firstMatchPos = [0,0]
@@ -227,7 +232,7 @@ function! s:MatchInCurrent( lines, matches, matchTemplate, options, isInCompleti
 	    endif
 
 	    let l:matchEndPos = searchpos( l:pattern, 'cen' )
-	    if a:isInCompletionWindow && ingo#pos#IsInside(l:save_cursor[1:2], l:matchPos, l:matchEndPos)
+	    if a:isInCompletionWindow && ingo#pos#IsInside(l:cursor, l:matchPos, l:matchEndPos)
 		" Do not include a match around the cursor position; this would
 		" either just return the completion base, which Vim would not
 		" offer anyway, or the completion base and following text, which
@@ -243,11 +248,11 @@ function! s:MatchInCurrent( lines, matches, matchTemplate, options, isInCompleti
 	    let l:matchText = (has_key(a:options, 'extractor') ? a:options.extractor(l:matchPos, l:matchEndPos, l:matchObj) : ingo#text#Get(l:matchPos, l:matchEndPos))
 
 	    call CompleteHelper#AddMatch(a:matches, l:matchObj, l:matchText, a:options)
-"****D echomsg '**** completion triggered from' string(l:save_cursor[1:2])
+"****D echomsg '**** completion triggered from' string(l:cursor)
 "****D echomsg '**** match in' . (a:isInCompletionWindow ? ' current' : '') 'buffer' bufnr('') 'from' string(l:matchPos) 'to' string(l:matchEndPos) string(l:matchText)
 	endwhile
 
-	call setpos('.', l:save_cursor)
+	call winrestview(l:save_view)
     endfor
 endfunction
 function! s:FindInCurrentWindow( alreadySearchedBuffers, matches, Funcref, matchTemplate, options, isInCompletionWindow )
