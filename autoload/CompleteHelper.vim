@@ -2,12 +2,13 @@
 "
 " DEPENDENCIES:
 "   - ingo/compat.vim autoload script
+"   - ingo/compat/window.vim autoload script
 "   - ingo/list.vim autoload script
 "   - ingo/pos.vim autoload script
 "   - ingo/text.vim autoload script
 "   - CompleteHelper/Abbreviate.vim autoload script
 "
-" Copyright: (C) 2008-2015 Ingo Karkat
+" Copyright: (C) 2008-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -17,6 +18,7 @@
 "				position when matching in the current window.
 "				Else, a completion may change the current view.
 "				(Custom a:Funcref need to do such themselves.)
+"				Use ingo#compat#window#IsCmdlineWindow().
 "   1.51.031	07-Feb-2015	ENH: Keep previous (last accessed) window when
 "				searching through them for matches.
 "   1.51.030	04-Feb-2015	Regression: CompleteHelper#Find() causes "E121:
@@ -463,7 +465,7 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 	if l:places ==# '.'
 	    call s:FindInCurrentWindow(l:searchedBuffers, a:matches, function('s:MatchInCurrent'), {}, a:options, 1)
 	elseif l:places ==# 'w'
-	    if &l:buftype ==# 'nofile' && (bufname('') ==# (v:version < 702 ? 'command-line' : '[Command Line]') || bufname('') ==# 'option-window')
+	    if &l:buftype ==# 'nofile' && (ingo#compat#window#IsCmdlineWindow() || bufname('') ==# 'option-window')
 		" In the command-line window, we cannot temporarily leave it to
 		" search in other windows: "E11: Invalid in command-line
 		" window". Work around this by performing the buffer search for
