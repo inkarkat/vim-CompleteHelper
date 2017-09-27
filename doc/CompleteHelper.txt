@@ -203,7 +203,7 @@ To uninstall, use the |:RmVimball| command.
 DEPENDENCIES					 *CompleteHelper-dependencies*
 
 - Requires Vim 7.0 or higher.
-- Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.019 or
+- Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.028 or
   higher.
 
 CONFIGURATION					*CompleteHelper-configuration*
@@ -244,6 +244,8 @@ HISTORY						      *CompleteHelper-history*
   the current window. Else, a completion may change the current view.
 - CompleteHelper#Abbreviate#Word(): Only offer the full word in the preview
   window if a:matchObj.info hasn't been set yet.
+- Use ingo#compat#window#IsCmdlineWindow().
+  *** You need to update to ingo-library (vimscript #4433) version 1.028! ***
 
 1.51	23-Apr-2015
 - Backwards compatibility: haslocaldir() doesn't exist in Vim 7.0.
