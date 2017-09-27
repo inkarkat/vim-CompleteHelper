@@ -92,6 +92,7 @@ StartEndComplete:	Completes keywords from a prefix-nonkeyword-suffix
 			base.
 
 WORDComplete:	    	Completes an entire sequence of non-blank characters.
+(vimscript #5613)
 
 RELATED WORKS								     *
 
@@ -369,7 +370,7 @@ First published version.
 Started development.
 
 ==============================================================================
-Copyright: (C) 2008-2016 Ingo Karkat
+Copyright: (C) 2008-2017 Ingo Karkat
 The VIM LICENSE applies to this plugin; see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>
