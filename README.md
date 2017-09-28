@@ -217,7 +217,7 @@ https://github.com/inkarkat/vim-CompleteHelper/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
-##### 1.52    RELEASEME
+##### 1.52    28-Sep-2017
 - Need to restore entire view, not just the cursor position when matching in
   the current window. Else, a completion may change the current view.
 - CompleteHelper#Abbreviate#Word(): Only offer the full word in the preview
