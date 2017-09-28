@@ -4,49 +4,10 @@
 "   - ingo/msg.vim autoload script
 "   - ingo/text.vim autoload script
 "
-" Copyright: (C) 2011-2014 Ingo Karkat
+" Copyright: (C) 2011-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.40.007	09-Apr-2014	Add CompleteHelper#Repeat#GetPattern() to
-"				encapsulate the common assembly of the repeat
-"				pattern, especially the complex expressions with
-"				negative and positive character expressions to
-"				emulate Vim's built-in completion repeat
-"				behavior.
-"   1.40.006	07-Apr-2014	Align the multi-line completion with Vim's
-"				built-in behavior: Keep trailing whitespace,
-"				only condense the newline and indent. Also
-"				condense a newline when it's inside a match, not
-"				just at the front. The built-in completion only
-"				skips across a single newline (plus indent);
-"				else truncate / discard the match and issue the
-"				same error message.
-"   1.40.005	06-Apr-2014	I18N: Correctly handle repeats of (text ending
-"				with a) multi-byte character: Instead of just
-"				subtracting one from the column, ask for an
-"				end-exclusive text grab from ingo#text#Get().
-"   1.40.004	05-Apr-2014	Allow completion repeats to continue repeating
-"				from following lines like the built-in
-"				completions do: The newline plus any indent is
-"				removed, and just the first word from the
-"				following line is matched. For this, the
-"				CompleteHelper#Repeat#Processor() is offered. It
-"				transforms the leading whitespace of the match,
-"				and manipulates the internal completion records
-"				so that the original completion text is kept
-"				(and therefore continues to match), even though
-"				only the word itself has been inserted as a
-"				completion candidate.
-"				Allow to cancel repeats via
-"				CompleteHelper#Repeat#Clear().
-"   1.33.003	18-Dec-2013	Use ingo#text#Get() instead of
-"				CompleteHelper#ExtractText().
-"   1.11.002	01-Sep-2012	Make a:matchObj in CompleteHelper#ExtractText()
-"				optional; it's not used there, anyway.
-"   1.00.001	09-Oct-2011	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 
