@@ -17,55 +17,39 @@ completion is quick and simple.
 
 The following custom completions use this plugin:
 
-- AlphaComplete ([vimscript #4912](http://www.vim.org/scripts/script.php?script_id=4912)):
+- AlphaComplete.vim ([vimscript #4912](http://www.vim.org/scripts/script.php?script_id=4912)):
   Completes any sequence of alphabetic characters.
-- BidiComplete ([vimscript #4658](http://www.vim.org/scripts/script.php?script_id=4658)):
+- BidiComplete.vim ([vimscript #4658](http://www.vim.org/scripts/script.php?script_id=4658)):
   Considers text before AND AFTER the cursor.
-- BufNameComplete ((unreleased)):
-  Completes filenames loaded in Vim.
-- CamelCaseComplete ([vimscript #3915](http://www.vim.org/scripts/script.php?script_id=3915)):
+- CamelCaseComplete.vim ([vimscript #3915](http://www.vim.org/scripts/script.php?script_id=3915)):
   Expands CamelCaseWords and underscore\_words based on anchor characters for
   each word fragment.
-- CustomKeywordComplete ((unreleased)):
-  Expands keywords from a sequence of contained characters.
-- EntryComplete ([vimscript #5073](http://www.vim.org/scripts/script.php?script_id=5073)):
+- EntryComplete.vim ([vimscript #5073](http://www.vim.org/scripts/script.php?script_id=5073)):
   Completes whole lines from designated files or buffers.
-- InnerFragmentComplete ([vimscript #4804](http://www.vim.org/scripts/script.php?script_id=4804)):
+- InnerFragmentComplete.vim ([vimscript #4804](http://www.vim.org/scripts/script.php?script_id=4804)):
   Completes (and expands CamelCaseWord) fragments inside words.
-- LineComplete ([vimscript #4911](http://www.vim.org/scripts/script.php?script_id=4911)):
+- LineComplete.vim ([vimscript #4911](http://www.vim.org/scripts/script.php?script_id=4911)):
   Completes entire lines with looser matching that the built-in
   i\_CTRL-X\_CTRL-L.
-- LongestComplete ((unreleased)):
-  Completes based on the longest possible text before the cursor.
-- MiddleEndComplete ((unreleased)):
-  Completes base matches in the middle or end.
-- MinLengthComplete ((unreleased)):
-  Only offers completions that add more than n characters.
-- MotionComplete ([vimscript #4265](http://www.vim.org/scripts/script.php?script_id=4265)):
+- MotionComplete.vim ([vimscript #4265](http://www.vim.org/scripts/script.php?script_id=4265)):
   Completes a chunk covered by queried {motion} or text object.
-  - BracketComplete ([vimscript #4266](http://www.vim.org/scripts/script.php?script_id=4266)):
+  - BracketComplete.vim ([vimscript #4266](http://www.vim.org/scripts/script.php?script_id=4266)):
     Completes text inside various brackets.
-  - LineEndComplete ([vimscript #4267](http://www.vim.org/scripts/script.php?script_id=4267)):
+  - LineEndComplete.vim ([vimscript #4267](http://www.vim.org/scripts/script.php?script_id=4267)):
     Completes the rest of the line.
-- MultiWordComplete ([vimscript #4805](http://www.vim.org/scripts/script.php?script_id=4805)):
+- MultiWordComplete.vim ([vimscript #4805](http://www.vim.org/scripts/script.php?script_id=4805)):
   Completes a sequence of words based on anchor characters for each word.
-- PatternComplete ([vimscript #4248](http://www.vim.org/scripts/script.php?script_id=4248)):
+- PatternComplete.vim ([vimscript #4248](http://www.vim.org/scripts/script.php?script_id=4248)):
   Completes matches of queried {pattern} or last search pattern.
-- PrevInsertComplete ([vimscript #4185](http://www.vim.org/scripts/script.php?script_id=4185)):
+- PrevInsertComplete.vim ([vimscript #4185](http://www.vim.org/scripts/script.php?script_id=4185)):
   Recall and insert mode completion for previously inserted text.
-- QuoteComplete ((unreleased)):
-  Completes single-, double-, and other quoted strings.
-- RegisterComplete ((unreleased)):
-  Completes register contents.
-- SameFiletypeComplete ([vimscript #4242](http://www.vim.org/scripts/script.php?script_id=4242)):
+- SameFiletypeComplete.vim ([vimscript #4242](http://www.vim.org/scripts/script.php?script_id=4242)):
   Completion from buffers with the same filetype.
-- SnippetComplete ([vimscript #2926](http://www.vim.org/scripts/script.php?script_id=2926)):
+- SnippetComplete.vim ([vimscript #2926](http://www.vim.org/scripts/script.php?script_id=2926)):
   Completes defined abbreviations and other snippets.
-- SpecialLocationComplete ([vimscript #5120](http://www.vim.org/scripts/script.php?script_id=5120)):
+- SpecialLocationComplete.vim ([vimscript #5120](http://www.vim.org/scripts/script.php?script_id=5120)):
   Completes special, configurable custom patterns.
-- StartEndComplete ((unreleased)):
-  Completes keywords from a prefix-nonkeyword-suffix base.
-- WORDComplete ([vimscript #5613](http://www.vim.org/scripts/script.php?script_id=5613)):
+- WORDComplete.vim ([vimscript #5613](http://www.vim.org/scripts/script.php?script_id=5613)):
   Completes an entire sequence of non-blank characters.
 
 ### RELATED WORKS
