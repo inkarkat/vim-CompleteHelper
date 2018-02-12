@@ -11,7 +11,9 @@ endfunction
 " a:idx	    Use -1 to cancel completion, 0 when only one unique match is
 "	    expected, 1 for the first match, 2 for the second, etc.
 function! s:CompletionKeys( idx )
-    return s:completeMapping . repeat("\<C-n>", (a:idx - 1)) . (a:idx == -1 ? "\<C-e>" : '') . (a:idx > 0 ? "\<C-y>" : '')
+    " XXX: Cannot use <C-n> since Vim 8.0.1482: "using feedkeys() does not work
+    " to test completion". Fortunately, <Down> is a suitable replacement?!
+    return s:completeMapping . repeat("\<Down>", (a:idx - 1)) . (a:idx == -1 ? "\<C-e>" : '') . (a:idx > 0 ? "\<C-y>" : '')
 endfunction
 function! Insert( base, idx )
     stopinsert
