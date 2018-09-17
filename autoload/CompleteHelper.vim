@@ -1,14 +1,15 @@
 " CompleteHelper.vim: Generic functions to support custom insert mode completions.
 "
 " DEPENDENCIES:
+"   - CompleteHelper/Abbreviate.vim autoload script
 "   - ingo/compat.vim autoload script
 "   - ingo/compat/window.vim autoload script
 "   - ingo/list.vim autoload script
 "   - ingo/pos.vim autoload script
 "   - ingo/text.vim autoload script
-"   - CompleteHelper/Abbreviate.vim autoload script
+"   - ingo/workingdir.vim autoload script
 "
-" Copyright: (C) 2008-2017 Ingo Karkat
+" Copyright: (C) 2008-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -127,7 +128,7 @@ function! s:FindInOtherWindows( alreadySearchedBuffers, matches, Funcref, option
     " Unfortunately, restoring the 'autochdir' option clobbers any temporary CWD
     " override. So we may have to restore the CWD, too.
     let l:save_cwd = getcwd()
-    let l:chdirCommand = (exists('*haslocaldir') && haslocaldir() ? 'lchdir!' : 'chdir!')
+    let l:chdirCommand = ingo#workingdir#ChdirCommand()
 
     " The 'autochdir' option adapts the CWD, so any (relative) filepath to the
     " filename in the other window would be omitted. Temporarily turn this off;

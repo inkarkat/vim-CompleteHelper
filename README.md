@@ -124,7 +124,7 @@ from the current file, like the built-in compl-current does. From the
 completion base, it constructs a regexp matching all keywords that start with
 the base, and delegates the entire work of finding the matches and building
 the appropriate match objects to CompleteHelper#FindMatches().
->
+
     function! SimpleComplete( findstart, base )
         if a:findstart
             " Locate the start of the keyword.
@@ -165,7 +165,7 @@ To uninstall, use the :RmVimball command.
 ### DEPENDENCIES
 
 - Requires Vim 7.0 or higher.
-- Requires the ingo-library.vim plugin ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)), version 1.028 or
+- Requires the ingo-library.vim plugin ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)), version 1.035 or
   higher.
 
 ### CONFIGURATION
@@ -200,6 +200,9 @@ https://github.com/inkarkat/vim-CompleteHelper/issues or email (address below).
 
 HISTORY
 ------------------------------------------------------------------------------
+
+##### 1.53    RELEASEME
+-   __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.035!__
 
 ##### 1.52    28-Sep-2017
 - Need to restore entire view, not just the cursor position when matching in
@@ -331,7 +334,7 @@ HISTORY
 - Started development.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2008-2017 Ingo Karkat -
+Copyright: (C) 2008-2018 Ingo Karkat -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 
 Maintainer:     Ingo Karkat <ingo@karkat.de>
