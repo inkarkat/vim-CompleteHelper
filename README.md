@@ -1,4 +1,4 @@
-COMPLETE HELPER   
+COMPLETE HELPER
 ===============================================================================
 _by Ingo Karkat_
 
@@ -165,7 +165,7 @@ To uninstall, use the :RmVimball command.
 ### DEPENDENCIES
 
 - Requires Vim 7.0 or higher.
-- Requires the ingo-library.vim plugin ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)), version 1.035 or
+- Requires the ingo-library.vim plugin ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)), version 1.036 or
   higher.
 
 ### CONFIGURATION
@@ -202,7 +202,10 @@ HISTORY
 ------------------------------------------------------------------------------
 
 ##### 1.53    RELEASEME
--   __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.035!__
+- ENH: Do caching of unloaded buffer contents that are searched for
+  completions.
+
+__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.036!__
 
 ##### 1.52    28-Sep-2017
 - Need to restore entire view, not just the cursor position when matching in
@@ -210,7 +213,8 @@ HISTORY
 - CompleteHelper#Abbreviate#Word(): Only offer the full word in the preview
   window if a:matchObj.info hasn't been set yet.
 - Use ingo#compat#window#IsCmdlineWindow().
-  __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.028!__
+
+__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.028!__
 
 ##### 1.51    23-Apr-2015
 - Backwards compatibility: haslocaldir() doesn't exist in Vim 7.0.
@@ -255,7 +259,8 @@ HISTORY
   in the match, not just at the end. We must not only avoid matching the base,
   but any text around the cursor. This is especially important for completion
   repeats, to avoid offering text after the cursor.
-  __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.019!__
+
+__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.019!__
 
 ##### 1.40    16-Apr-2014
 - Remove the duplicated implementation in CompleteHelper#ExtractText(),
@@ -280,14 +285,17 @@ HISTORY
   the repeat pattern, especially the complex expressions with negative and
   positive character expressions to emulate Vim's built-in completion repeat
   behavior.
-  __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.018!__
+
+__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.018!__
 
 ##### 1.32    14-Dec-2013
 - ENH: Allow to pass a List of regular expressions to
   CompleteHelper#FindMatches(). If you have multiple regular expressions that
   can match at the same position and should yield separate matches, you cannot
   use regular expression branches.
-- Add dependency to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)). __You need to separately
+- Add dependency to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)).
+
+__You need to separately
   install ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.014 (or higher)!__
 
 ##### 1.31    07-Mar-2013
@@ -334,7 +342,7 @@ HISTORY
 - Started development.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2008-2018 Ingo Karkat -
+Copyright: (C) 2008-2019 Ingo Karkat -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 
 Maintainer:     Ingo Karkat <ingo@karkat.de>

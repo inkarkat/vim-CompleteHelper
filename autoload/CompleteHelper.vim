@@ -9,7 +9,7 @@
 "   - ingo/text.vim autoload script
 "   - ingo/workingdir.vim autoload script
 "
-" Copyright: (C) 2008-2018 Ingo Karkat
+" Copyright: (C) 2008-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -174,14 +174,11 @@ function! s:GetBufferLines( bufNr )
 	return getbufline(a:bufNr, 1, '$')
     else
 	" getbufline() can only access loaded buffers, for unloaded ones, we
-	" need to use readfile(). This has the downside of not considering the
-	" file's encoding, but Vim's built-in completion (in version 7.4.316)
-	" doesn't, neither (presumably because it also uses readfile()).
-	try
-	    return readfile(bufname(a:bufNr))
-	catch /^Vim\%((\a\+)\)\=:E484/ " E484: Can't open file
-	    return []
-	endtry
+	" need to load the file ourselves. This has the downside of not
+	" considering the file's encoding, but Vim's built-in completion (in
+	" version 7.4.316) doesn't, neither (presumably because it also uses
+	" readfile()).
+	return ingo#file#GetLines(bufname(a:bufNr))
     endif
 endfunction
 function! s:MatchInBuffer( lines, matches, matchTemplate, options, isInCompletionWindow )
