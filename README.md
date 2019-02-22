@@ -201,9 +201,11 @@ https://github.com/inkarkat/vim-CompleteHelper/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
-##### 1.53    RELEASEME
+##### 1.60    RELEASEME
 - ENH: Do caching of unloaded buffer contents that are searched for
   completions.
+- ENH: Support arbitrary external files as completion sources via
+  a:options.filespecs.
 
 __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.036!__
 

@@ -169,6 +169,15 @@ function! s:GetBufNrs( expr )
     \   a:expr
     \)
 endfunction
+function! s:LookupBufNrs( filespecs )
+    return map(a:filespecs, 's:LookupBufNr(v:val)')
+endfunction
+function! s:LookupBufNr( filespec )
+    let l:absoluteFilespec = fnamemodify(a:filespec, ":p")
+    let l:bufNr = bufnr(ingo#escape#file#bufnameescape(l:absoluteFilespec))
+
+    return (l:bufNr == -1 ? l:absoluteFilespec : l:bufNr)
+endfunction
 function! s:GetBufferLines( bufNr )
     if bufloaded(a:bufNr)
 	return getbufline(a:bufNr, 1, '$')
@@ -211,15 +220,22 @@ function! s:FindInOtherBuffers( alreadySearchedBuffers, matches, Funcref, option
 	    continue
 	endif
 	let a:alreadySearchedBuffers[l:bufNr] = 1
-	if ! s:ShouldBeSearched(a:options, l:bufNr)
-	    continue
+	if type(l:bufNr) == type(0)
+	    if ! s:ShouldBeSearched(a:options, l:bufNr)
+		continue
+	    endif
+
+	    let l:matchTemplate = {'menu': bufname(l:bufNr)}
+
+	    " We need to get all lines at once; there is no other way to remotely
+	    " determine the number of lines in the other buffer.
+	    call call(a:Funcref, [s:GetBufferLines(l:bufNr), a:matches, l:matchTemplate, a:options, 0])
+	else
+	    " Also handle filespecs passed via a:options.filespecs.
+	    let l:matchTemplate = {'menu': fnamemodify(l:bufNr, ':t')}
+
+	    call call(a:Funcref, [ingo#file#GetLines(l:bufNr), a:matches, l:matchTemplate, a:options, 0])
 	endif
-
-	let l:matchTemplate = {'menu': bufname(l:bufNr)}
-
-	" We need to get all lines at once; there is no other way to remotely
-	" determine the number of lines in the other buffer.
-	call call(a:Funcref, [s:GetBufferLines(l:bufNr), a:matches, l:matchTemplate, a:options, 0])
     endfor
 endfunction
 function! CompleteHelper#FindMatches( matches, pattern, options )
@@ -262,6 +278,9 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 "			    - "b" other loaded buffers that are in the buffer list
 "			    - "u" unloaded buffers that are in the buffer list
 "			    - "U" buffers that are not in the buffer list
+"   a:options.filespecs     A list of filespecs that are searched, regardless of
+"                           a:options.complete and whether they exist as a
+"                           buffer or not.
 "   a:options.backward_search	Flag whether to search backwards from the cursor
 "				position.
 "   a:options.extractor	    Funcref that extracts the matched text from the
@@ -335,6 +354,12 @@ function! CompleteHelper#FindMatches( matches, pattern, options )
 	    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, function('s:MatchInBuffer'), a:options, s:GetBufNrs('! buflisted(v:val)'))
 	endif
     endfor
+
+    let l:filespecs = get(a:options, 'filespecs', '')
+    if ! empty(l:filespecs)
+	call s:FindInOtherBuffers(l:searchedBuffers, a:matches, function('s:MatchInBuffer'), a:options, s:LookupBufNrs(l:filespecs))
+    endif
+
     unlet s:patterns
 endfunction
 function! CompleteHelper#Find( matches, Funcref, options )
@@ -372,6 +397,9 @@ function! CompleteHelper#Find( matches, Funcref, options )
 "			    - "b" other loaded buffers that are in the buffer list
 "			    - "u" unloaded buffers that are in the buffer list
 "			    - "U" buffers that are not in the buffer list
+"   a:options.filespecs     A list of filespecs that are searched, regardless of
+"                           a:options.complete and whether they exist as a
+"                           buffer or not.
 "   a:options.bufferPredicate   Funcref that decides whether a particular buffer
 "				should be searched. It is passed a buffer number
 "				and must return 0 when the buffer should be
@@ -415,6 +443,11 @@ function! CompleteHelper#Find( matches, Funcref, options )
 	    call s:FindInOtherBuffers(l:searchedBuffers, a:matches, a:Funcref, a:options, s:GetBufNrs('! buflisted(v:val)'))
 	endif
     endfor
+
+    let l:filespecs = get(a:options, 'filespecs', '')
+    if ! empty(l:filespecs)
+	call s:FindInOtherBuffers(l:searchedBuffers, a:matches, a:Funcref, a:options, s:LookupBufNrs(l:filespecs))
+    endif
 endfunction
 
 " Deprecated. Use CompleteHelper#Abbreviate#Word() instead.
