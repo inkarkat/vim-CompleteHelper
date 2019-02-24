@@ -61,6 +61,8 @@ The following custom completions use this plugin:
   Completion from last used files.
 - |MultiWordComplete.vim| (vimscript #4805):
   Completes a sequence of words based on anchor characters for each word.
+- |PatternBranchComplete.vim| (vimscript #0000):
+  Insert mode completion for branches in the current search pattern.
 - |PatternComplete.vim| (vimscript #4248):
   Completes matches of queried {pattern} or last search pattern.
 - |PrevInsertComplete.vim| (vimscript #4185):
