@@ -57,6 +57,8 @@ The following custom completions use this plugin:
     Completes text inside various brackets.
   - |LineEndComplete.vim| (vimscript #4267):
     Completes the rest of the line.
+- |MRUFileComplete.vim| (vimscript #0000):
+  Completion from last used files.
 - |MultiWordComplete.vim| (vimscript #4805):
   Completes a sequence of words based on anchor characters for each word.
 - |PatternComplete.vim| (vimscript #4248):
