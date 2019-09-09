@@ -207,7 +207,7 @@ HISTORY
 - ENH: Support arbitrary external files as completion sources via
   a:options.filespecs.
 
-__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.036!__
+__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.039!__
 
 ##### 1.52    28-Sep-2017
 - Need to restore entire view, not just the cursor position when matching in
@@ -347,4 +347,4 @@ __You need to separately
 Copyright: (C) 2008-2019 Ingo Karkat -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 
-Maintainer:     Ingo Karkat <ingo@karkat.de>
+Maintainer:     Ingo Karkat &lt;ingo@karkat.de&gt;

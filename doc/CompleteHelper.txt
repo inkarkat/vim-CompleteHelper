@@ -244,7 +244,7 @@ HISTORY						      *CompleteHelper-history*
   completions.
 - ENH: Support arbitrary external files as completion sources via
   a:options.filespecs.
-  *** You need to update to ingo-library (vimscript #4433) version 1.036! ***
+  *** You need to update to ingo-library (vimscript #4433) version 1.039! ***
 
 1.52	28-Sep-2017
 - Need to restore entire view, not just the cursor position when matching in

@@ -3,18 +3,15 @@
 " DEPENDENCIES:
 "   - ingo/avoidprompt.vim autoload script
 "
-" Copyright: (C) 2012-2017 Ingo Karkat
+" Copyright: (C) 2012-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
-function! s:ListChar( settingFilter, fallback )
-    let listchar = matchstr(&listchars, a:settingFilter)
-    return (empty(listchar) ? a:fallback : listchar)
-endfunction
-let s:tabReplacement = s:ListChar('tab:\zs..', '^I')
-let s:eolReplacement = s:ListChar('eol:\zs.', '^J') " Vim commands like :reg show newlines as ^J.
-delfunction s:ListChar
+let s:listcharsDict = ingo#option#listchars#GetValues()
+let s:tabReplacement = get(s:listcharsDict, 'tab', '^I')
+let s:eolReplacement = get(s:listcharsDict, 'eol', '^J') " Vim commands like :reg show newlines as ^J.
+unlet s:listcharsDict
 
 function! CompleteHelper#Abbreviate#Translate( text )
     let l:text = substitute(a:text, '\t', s:tabReplacement, 'g')
