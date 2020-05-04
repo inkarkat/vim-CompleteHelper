@@ -21,8 +21,6 @@ function! Insert( base, idx )
     execute 'normal' l:keys
 endfunction
 function! InsertRepeat( base, ... )
-    call vimtest#SkipAndQuitIf(v:version > 802 || v:version == 802 && has('patch614'), 'Newer Vim versions disallow text insertion while completing (and feedkeys() does not work).')
-
     stopinsert
     execute 'normal! a' . a:base . "\<Esc>"
 
