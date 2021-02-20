@@ -9,7 +9,7 @@
 "   - ingo/text.vim autoload script
 "   - ingo/workingdir.vim autoload script
 "
-" Copyright: (C) 2008-2019 Ingo Karkat
+" Copyright: (C) 2008-2021 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -111,58 +111,78 @@ function! s:FindInCurrentWindow( alreadySearchedBuffers, matches, Funcref, match
 
     call call(a:Funcref, [[], a:matches, a:matchTemplate, a:options, a:isInCompletionWindow])
 endfunction
-function! s:FindInOtherWindows( alreadySearchedBuffers, matches, Funcref, options )
-    let l:originalWinNr = winnr()
-    let l:previousWinNr = winnr('#') ? winnr('#') : 1
-    let l:originalBufNr = bufnr('')
-    if winnr('$') == 1 && has_key(a:alreadySearchedBuffers, l:originalBufNr)
-	" There's only one window, and we have searched it already (probably via s:FindInCurrentWindow()).
-	return
-    endif
+if exists('*win_execute')
+    function! s:FindInOtherWindows( alreadySearchedBuffers, matches, Funcref, options )
+	let l:originalBufNr = bufnr('')
+	if winnr('$') == 1 && has_key(a:alreadySearchedBuffers, l:originalBufNr)
+	    " There's only one window, and we have searched it already (probably via s:FindInCurrentWindow()).
+	    return
+	endif
 
-    " By entering a window, its height is potentially increased from 0 to 1 (the
-    " minimum for the current window). To avoid any modification, save the window
-    " sizes and restore them after visiting all windows.
-    let l:originalWindowLayout = winrestcmd()
-
-    " Unfortunately, restoring the 'autochdir' option clobbers any temporary CWD
-    " override. So we may have to restore the CWD, too.
-    let l:save_cwd = getcwd()
-    let l:chdirCommand = ingo#workingdir#ChdirCommand()
-
-    " The 'autochdir' option adapts the CWD, so any (relative) filepath to the
-    " filename in the other window would be omitted. Temporarily turn this off;
-    " may be a little bit faster, too.
-    if exists('+autochdir')
-	let l:save_autochdir = &autochdir
-	set noautochdir
-    endif
-
-    try
 	for l:winNr in range(1, winnr('$'))
 	    let l:bufNr = winbufnr(l:winNr)
 	    if l:bufNr != l:originalBufNr &&
 	    \   ! has_key(a:alreadySearchedBuffers, l:bufNr) &&
 	    \   s:ShouldBeSearched(a:options, l:bufNr)
-		execute 'noautocmd' l:winNr . 'wincmd w'
-
-		let l:matchTemplate = {'menu': bufname('')}
-		call s:FindInCurrentWindow(a:alreadySearchedBuffers, a:matches, a:Funcref, l:matchTemplate, a:options, 0)
+		let l:matchTemplate = {'menu': bufname(l:bufNr)}
+		call win_execute(win_getid(l:winNr), 'noautocmd call s:FindInCurrentWindow(a:alreadySearchedBuffers, a:matches, a:Funcref, l:matchTemplate, a:options, 0)')
 	    endif
 	endfor
-    finally
-	noautocmd execute l:previousWinNr . 'wincmd w'
-	noautocmd execute l:originalWinNr . 'wincmd w'
-	silent! execute l:originalWindowLayout
+    endfunction
+else
+    function! s:FindInOtherWindows( alreadySearchedBuffers, matches, Funcref, options )
+	let l:originalWinNr = winnr()
+	let l:previousWinNr = winnr('#') ? winnr('#') : 1
+	let l:originalBufNr = bufnr('')
+	if winnr('$') == 1 && has_key(a:alreadySearchedBuffers, l:originalBufNr)
+	    " There's only one window, and we have searched it already (probably via s:FindInCurrentWindow()).
+	    return
+	endif
 
-	if exists('l:save_autochdir')
-	    let &autochdir = l:save_autochdir
+	" By entering a window, its height is potentially increased from 0 to 1 (the
+	" minimum for the current window). To avoid any modification, save the window
+	" sizes and restore them after visiting all windows.
+	let l:originalWindowLayout = winrestcmd()
+
+	" Unfortunately, restoring the 'autochdir' option clobbers any temporary CWD
+	" override. So we may have to restore the CWD, too.
+	let l:save_cwd = getcwd()
+	let l:chdirCommand = ingo#workingdir#ChdirCommand()
+
+	" The 'autochdir' option adapts the CWD, so any (relative) filepath to the
+	" filename in the other window would be omitted. Temporarily turn this off;
+	" may be a little bit faster, too.
+	if exists('+autochdir')
+	    let l:save_autochdir = &autochdir
+	    set noautochdir
 	endif
-	if getcwd() !=# l:save_cwd
-	    execute l:chdirCommand ingo#compat#fnameescape(l:save_cwd)
-	endif
-    endtry
-endfunction
+
+	try
+	    for l:winNr in range(1, winnr('$'))
+		let l:bufNr = winbufnr(l:winNr)
+		if l:bufNr != l:originalBufNr &&
+		\   ! has_key(a:alreadySearchedBuffers, l:bufNr) &&
+		\   s:ShouldBeSearched(a:options, l:bufNr)
+		    execute 'noautocmd' l:winNr . 'wincmd w'
+
+		    let l:matchTemplate = {'menu': bufname('')}
+		    noautocmd call s:FindInCurrentWindow(a:alreadySearchedBuffers, a:matches, a:Funcref, l:matchTemplate, a:options, 0)
+		endif
+	    endfor
+	finally
+	    noautocmd execute l:previousWinNr . 'wincmd w'
+	    noautocmd execute l:originalWinNr . 'wincmd w'
+	    silent! execute l:originalWindowLayout
+
+	    if exists('l:save_autochdir')
+		let &autochdir = l:save_autochdir
+	    endif
+	    if getcwd() !=# l:save_cwd
+		execute l:chdirCommand ingo#compat#fnameescape(l:save_cwd)
+	    endif
+	endtry
+    endfunction
+endif
 function! s:GetBufNrs( expr )
     return filter(
     \   range(1, bufnr('$')),

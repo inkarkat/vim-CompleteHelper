@@ -206,6 +206,8 @@ HISTORY
   completions.
 - ENH: Support arbitrary external files as completion sources via
   a:options.filespecs.
+- Adapt: Vim 8.2.2426 forbids 'completefunc' to switch windows; need to use
+  win\_execute() now.
 
 __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.039!__
 
@@ -344,7 +346,7 @@ __You need to separately
 - Started development.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2008-2019 Ingo Karkat -
+Copyright: (C) 2008-2021 Ingo Karkat -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 
 Maintainer:     Ingo Karkat &lt;ingo@karkat.de&gt;
