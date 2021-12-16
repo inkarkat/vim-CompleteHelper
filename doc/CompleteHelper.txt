@@ -42,6 +42,8 @@ The following custom completions use this plugin:
   Completes whole lines from designated files or buffers.
 - |InnerFragmentComplete.vim| (vimscript #4804):
   Completes (and expands CamelCaseWord) fragments inside words.
+- |KeywordPlusOneComplete.vim| (vimscript #0000):
+  Completes a sequence of keyword and one non-keyword character.
 - |LineComplete.vim| (vimscript #4911):
   Completes entire lines with looser matching that the built-in
   |i_CTRL-X_CTRL-L|.
