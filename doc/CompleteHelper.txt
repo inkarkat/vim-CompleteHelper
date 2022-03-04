@@ -67,6 +67,8 @@ The following custom completions use this plugin:
   Insert mode completion for branches in the current search pattern.
 - |PatternComplete.vim| (vimscript #4248):
   Completes matches of queried {pattern} or last search pattern.
+  - |MarkComplete.vim| (vimscript #0000):
+    Comples matches of mark.vim (vimscript #2666) patterns.
 - |PrevInsertComplete.vim| (vimscript #4185):
   Recall and insert mode completion for previously inserted text.
 - |QuoteComplete.vim| (vimscript #0000):
@@ -380,7 +382,7 @@ First published version.
 Started development.
 
 ==============================================================================
-Copyright: (C) 2008-2021 Ingo Karkat
+Copyright: (C) 2008-2022 Ingo Karkat
 The VIM LICENSE applies to this plugin; see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>
