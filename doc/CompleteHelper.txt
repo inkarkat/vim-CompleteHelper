@@ -85,6 +85,8 @@ The following custom completions use this plugin:
   Completes keywords from a prefix-nonkeyword-suffix base.
 - |WORDComplete.vim| (vimscript #5613):
   Completes an entire sequence of non-blank characters.
+- |html_TagComplete.vim| (vimscript #0000):
+  Completion of inner / outer tag contents.
 
 RELATED WORKS								     *
 
